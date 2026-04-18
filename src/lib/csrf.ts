@@ -24,11 +24,54 @@ function parseOriginHeader(value: string | null) {
   }
 }
 
+function getHeaderValue(headers: Headers, name: string) {
+  const value = headers.get(name);
+  if (!value) {
+    return null;
+  }
+
+  return value
+    .split(",")
+    .map((part) => part.trim())
+    .find(Boolean) ?? null;
+}
+
+function getForwardedOrigin(request: Request) {
+  const forwardedHost = getHeaderValue(request.headers, "x-forwarded-host");
+  const host = forwardedHost ?? getHeaderValue(request.headers, "host");
+
+  if (!host) {
+    return null;
+  }
+
+  const requestUrl = new URL(request.url);
+  const forwardedProto = getHeaderValue(request.headers, "x-forwarded-proto");
+  const protocol = forwardedProto ? `${forwardedProto.replace(/:$/, "")}:` : requestUrl.protocol;
+
+  try {
+    return new URL(`${protocol}//${host}`);
+  } catch {
+    return null;
+  }
+}
+
+function getExpectedOrigins(request: Request, origin: string) {
+  const expectedOrigins = [new URL(origin), new URL(request.url)];
+  const forwardedOrigin = getForwardedOrigin(request);
+
+  if (forwardedOrigin) {
+    expectedOrigins.push(forwardedOrigin);
+  }
+
+  return expectedOrigins;
+}
+
 export function isTrustedOrigin(request: Request, origin: string) {
-  const expectedOrigin = new URL(origin);
   const requestOrigin = parseOriginHeader(request.headers.get("origin"));
+  const expectedOrigins = getExpectedOrigins(request, origin);
+
   if (requestOrigin) {
-    return isEquivalentOrigin(requestOrigin, expectedOrigin);
+    return expectedOrigins.some((expectedOrigin) => isEquivalentOrigin(requestOrigin, expectedOrigin));
   }
 
   const referer = request.headers.get("referer");
@@ -37,7 +80,8 @@ export function isTrustedOrigin(request: Request, origin: string) {
   }
 
   try {
-    return isEquivalentOrigin(new URL(referer), expectedOrigin);
+    const refererUrl = new URL(referer);
+    return expectedOrigins.some((expectedOrigin) => isEquivalentOrigin(refererUrl, expectedOrigin));
   } catch {
     return false;
   }
