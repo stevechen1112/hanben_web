@@ -27,6 +27,7 @@ const routeTitles: Record<string, string> = {
   "/admin/site-settings/navigation": "導覽選單",
   "/admin/site-settings/homepage": "首頁區塊",
   "/admin/site-settings/announcement": "公告列",
+  "/admin/users": "管理員權限",
 };
 
 function getPageTitle(pathname: string) {

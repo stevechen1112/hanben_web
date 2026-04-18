@@ -140,3 +140,7 @@ export function isAdminRole(
 ): role is "SUPER_ADMIN" | "ADMIN" | "EDITOR" {
   return role === "SUPER_ADMIN" || role === "ADMIN" || role === "EDITOR";
 }
+
+export function isSuperAdminRole(role: string | undefined): role is "SUPER_ADMIN" {
+  return role === "SUPER_ADMIN";
+}
