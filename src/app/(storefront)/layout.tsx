@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { AnnouncementBar } from "@/components/storefront/announcement-bar";
 import { StorefrontFooter } from "@/components/storefront/footer";
 import { StorefrontHeader } from "@/components/storefront/header";
+import { StorefrontSupportWidget } from "@/components/storefront/support-widget";
 import { getStorefrontChrome } from "@/lib/storefront";
 
 export default async function StorefrontLayout({ children }: { children: ReactNode }) {
@@ -27,6 +28,7 @@ export default async function StorefrontLayout({ children }: { children: ReactNo
           items={chrome.footerItems}
         />
       </div>
+      <StorefrontSupportWidget primaryUrl={chrome.settings.lineUrl || chrome.settings.facebookUrl || undefined} />
     </div>
   );
 }

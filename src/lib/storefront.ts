@@ -179,7 +179,6 @@ export const getHomepageData = cache(async () => {
     db.product.findMany({
       where: { status: "ACTIVE" },
       orderBy: { createdAt: "desc" },
-      take: 5,
       select: productCardSelect,
     }),
   ]);

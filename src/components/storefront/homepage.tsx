@@ -175,6 +175,14 @@ const defaultKnowledge: KnowledgeContent = {
   ],
 };
 
+const defaultHomepageProductOrder = [
+  "漢本三代-舒活飲-5包口感體驗組",
+  "漢本三代-舒活飲",
+  "漢本三代-舒活飲-15包-盒-2盒",
+  "漢本三代-舒活飲-15包-盒-3盒",
+  "漢本三代-舒活飲-15包-盒-4盒",
+];
+
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
 }
@@ -201,6 +209,22 @@ function formatCurrency(value: number | null) {
     currency: "TWD",
     maximumFractionDigits: 0,
   }).format(value);
+}
+
+function sortFeaturedProducts(products: ProductCard[], preferredOrder: string[]) {
+  const order = preferredOrder.length > 0 ? preferredOrder : defaultHomepageProductOrder;
+  const rankMap = new Map(order.map((slug, index) => [slug, index]));
+
+  return [...products].sort((left, right) => {
+    const leftRank = rankMap.get(left.slug) ?? Number.MAX_SAFE_INTEGER;
+    const rightRank = rankMap.get(right.slug) ?? Number.MAX_SAFE_INTEGER;
+
+    if (leftRank !== rightRank) {
+      return leftRank - rightRank;
+    }
+
+    return left.title.localeCompare(right.title, "zh-Hant");
+  });
 }
 
 function normalizeHeroMedia(slides: HeroSlide[], content: Record<string, unknown>): HeroMedia[] {
@@ -314,25 +338,53 @@ function HeroSection({ slides, content }: { slides: HeroSlide[]; content: Record
 }
 
 function StorySection({ content }: { content: StoryContent }) {
+  const [showVideo, setShowVideo] = useState(false);
+
   return (
     <section className="bg-white">
       <div className="storefront-page py-14 lg:py-18">
         <div className="mx-auto max-w-[980px]">
           <div className="storefront-prose text-center text-[1.08rem] leading-[2.05] text-[#49413b]" dangerouslySetInnerHTML={{ __html: content.body || "<p>內容待補。</p>" }} />
-          {content.videoUrl ? (
+          {showVideo && content.videoUrl ? (
             <div className="mt-10 overflow-hidden border border-[#eadfce] bg-black shadow-[0_14px_40px_rgba(43,27,10,0.08)]">
-              <video controls loop muted playsInline poster={content.videoPoster} className="aspect-[1.775/1] w-full object-cover">
+              <video controls autoPlay loop muted playsInline poster={content.videoPoster} className="aspect-[1.775/1] w-full object-cover">
                 <source src={content.videoUrl} type="video/mp4" />
               </video>
             </div>
           ) : content.videoPoster ? (
-            <div className="group relative mt-10 overflow-hidden border border-[#eadfce] shadow-[0_14px_40px_rgba(43,27,10,0.08)]">
-              <img src={content.videoPoster} alt="漢本品牌影片" className="aspect-[1.775/1] w-full object-cover" />
-              <div className="absolute inset-0 flex items-center justify-center bg-black/10">
-                <div className="flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full bg-white/92 text-[#bc2020] shadow-[0_10px_30px_rgba(0,0,0,0.18)] transition group-hover:scale-105">
-                  <Play className="ml-1 h-7 w-7" />
+            <div className="mt-10">
+              <button
+                type="button"
+                onClick={() => {
+                  if (content.videoUrl) {
+                    setShowVideo(true);
+                  }
+                }}
+                className="group relative block w-full overflow-hidden border border-[#eadfce] shadow-[0_14px_40px_rgba(43,27,10,0.08)]"
+                aria-label="載入影片：播放影片"
+              >
+                <img src={content.videoPoster} alt="漢本品牌影片" className="aspect-[1.775/1] w-full object-cover" />
+                <div className="absolute inset-0 flex items-center justify-center bg-black/10">
+                  <div className="flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full bg-white/92 text-[#bc2020] shadow-[0_10px_30px_rgba(0,0,0,0.18)] transition group-hover:scale-105">
+                    <Play className="ml-1 h-7 w-7" />
+                  </div>
                 </div>
-              </div>
+              </button>
+              {content.videoUrl ? (
+                <div className="mt-4 flex justify-center">
+                  <button
+                    type="button"
+                    onClick={() => setShowVideo(true)}
+                    className="inline-flex items-center gap-2 rounded-full border border-[#e1d2bb] px-5 py-2 text-sm font-medium text-[#5e4b39] transition hover:border-[#bc2020] hover:text-[#bc2020]"
+                  >
+                    載入影片：
+                    <span className="inline-flex items-center gap-1 text-[#bc2020]">
+                      播放影片
+                      <Play className="h-4 w-4" />
+                    </span>
+                  </button>
+                </div>
+              ) : null}
             </div>
           ) : null}
         </div>
@@ -609,13 +661,15 @@ export function Homepage({ slides, sections, featuredProducts }: { slides: HeroS
   const benefitItems = asObjectArray<BenefitItem>(benefitsContent.items, defaultBenefits);
   const rawFeaturedLimit = Number(productContent.limit ?? featuredProducts.length);
   const featuredLimit = Number.isFinite(rawFeaturedLimit) && rawFeaturedLimit > 0 ? rawFeaturedLimit : featuredProducts.length;
+  const configuredProductOrder = asStringArray(productContent.productSlugs);
+  const orderedFeaturedProducts = sortFeaturedProducts(featuredProducts, configuredProductOrder);
 
   return (
     <>
       <HeroSection slides={slides} content={heroContent} />
       <StorySection content={storyContent} />
       <StatsSection stats={stats} />
-      <ProductShowcaseSection title={(productContent.heading as string) || "漢本三代舒活飲系列"} products={featuredProducts.slice(0, featuredLimit)} />
+      <ProductShowcaseSection title={(productContent.heading as string) || "漢本三代舒活飲系列"} products={orderedFeaturedProducts.slice(0, featuredLimit)} />
       <BrandCommitmentSection content={{ headingLines: asStringArray(brandCommitmentContent.headingLines, defaultBrandCommitment.headingLines), bodyLines: asStringArray(brandCommitmentContent.bodyLines, defaultBrandCommitment.bodyLines) }} />
       <FeatureMediaSection content={featureMediaContent} />
       <BenefitsSection items={benefitItems} />
