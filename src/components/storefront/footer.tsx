@@ -38,7 +38,8 @@ export function StorefrontFooter({
   brandSummary: string;
   items: StorefrontNavItem[];
 }) {
-  const policyItem = items.find((item) => item.url.includes("privacy") || item.url.includes("return-policy")) ?? items[0] ?? null;
+  const policyItems = items.filter((item) => item.url.includes("privacy") || item.url.includes("return-policy") || item.url.includes("terms") || item.url.includes("contact"));
+  const policyItem = policyItems[0] ?? items[0] ?? null;
 
   return (
     <>
@@ -66,7 +67,22 @@ export function StorefrontFooter({
             © 2026 <Link href="/" className="transition hover:text-[#8f1212]">{siteName}</Link>, 由 Shopify 技術支援
           </p>
           <div className="flex items-center justify-center lg:justify-center">
-            <PolicyLink item={policyItem} label="條款及政策" />
+            {policyItems.length > 0 ? (
+              <details className="group relative">
+                <summary className="cursor-pointer list-none text-sm text-stone-500 transition hover:text-[#8f1212]">條款及政策</summary>
+                <div className="absolute left-1/2 top-full z-20 mt-3 min-w-40 -translate-x-1/2 border border-[#ebe3d8] bg-white p-4 text-left shadow-[0_16px_40px_rgba(0,0,0,0.08)]">
+                  <ul className="grid gap-3">
+                    {policyItems.map((item) => (
+                      <li key={item.id}>
+                        <PolicyLink item={item} label={item.title} />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </details>
+            ) : (
+              <PolicyLink item={policyItem} label="條款及政策" />
+            )}
           </div>
         </div>
       </div>

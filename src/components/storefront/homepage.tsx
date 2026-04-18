@@ -247,9 +247,8 @@ function normalizeHeroMedia(slides: HeroSlide[], content: Record<string, unknown
 
 function HeroSection({ slides, content }: { slides: HeroSlide[]; content: Record<string, unknown> }) {
   const heroSlides = normalizeHeroMedia(slides, content);
-  const badgeLines = asStringArray(content.badgeLines, ["天然漢方", "0 重金屬", "0 農藥、西藥", "台灣研發生產"]);
   const autoplayMs = typeof content.autoplayMs === "number" ? content.autoplayMs : 7000;
-  const configuredInitialIndex = typeof content.initialIndex === "number" ? content.initialIndex : 2;
+  const configuredInitialIndex = typeof content.initialIndex === "number" ? content.initialIndex : 0;
   const [activeIndex, setActiveIndex] = useState(() => {
     if (heroSlides.length === 0) {
       return 0;
@@ -280,31 +279,21 @@ function HeroSection({ slides, content }: { slides: HeroSlide[]; content: Record
   const goToNext = () => setActiveIndex((currentIndex) => (currentIndex + 1) % heroSlides.length);
 
   return (
-    <section className="bg-[#b89b68]">
-      <div className="relative overflow-hidden border-y border-[#b19367] bg-[#b89b68]">
-        <div className="absolute left-[7%] top-0 z-20 hidden translate-y-[14%] rounded-b-[3rem] border border-white/20 bg-[linear-gradient(180deg,rgba(255,255,255,0.38)_0%,rgba(196,198,210,0.58)_52%,rgba(120,120,132,0.72)_100%)] px-8 py-8 text-center text-white shadow-[0_14px_30px_rgba(0,0,0,0.18)] backdrop-blur-sm md:block lg:px-10">
-          <p className="text-[1.7rem] font-semibold leading-[1.75] drop-shadow-[0_1px_1px_rgba(0,0,0,0.2)] lg:text-[2rem]">
-            {badgeLines.map((line, index) => (
-              <span key={`${line}-${index}`}>
-                {line}
-                {index < badgeLines.length - 1 ? <br /> : null}
-              </span>
-            ))}
-          </p>
-        </div>
-
-        <div className="relative aspect-[16/10] w-full md:aspect-[16/9] lg:aspect-[16/9]">
+    <section className="bg-white">
+      <div className="relative overflow-hidden bg-white">
+        <div className="relative min-h-[25rem] w-full md:min-h-[34rem] lg:min-h-[45rem]">
           {current.videoDesktop || current.videoMobile ? (
             <>
-              <video key={`${activeIndex}-desktop`} autoPlay loop muted playsInline poster={current.poster} className="hidden h-full w-full object-cover md:block">
+              <div className="absolute inset-0 bg-black/15" />
+              <video key={`${activeIndex}-desktop`} autoPlay loop muted playsInline poster={current.poster} className="absolute inset-0 hidden h-full w-full object-cover md:block">
                 {current.videoDesktop ? <source src={current.videoDesktop} type="video/mp4" /> : null}
               </video>
-              <video key={`${activeIndex}-mobile`} autoPlay loop muted playsInline poster={current.poster} className="h-full w-full object-cover md:hidden">
+              <video key={`${activeIndex}-mobile`} autoPlay loop muted playsInline poster={current.poster} className="absolute inset-0 h-full w-full object-cover md:hidden">
                 {current.videoMobile ? <source src={current.videoMobile} type="video/mp4" /> : current.videoDesktop ? <source src={current.videoDesktop} type="video/mp4" /> : null}
               </video>
             </>
           ) : (
-            <picture>
+            <picture className="absolute inset-0 block h-full w-full">
               {current.imageMobile ? <source media="(max-width: 767px)" srcSet={current.imageMobile} /> : null}
               <img src={current.imageDesktop ?? current.poster} alt={current.alt ?? "漢本三代首頁主視覺"} className="h-full w-full object-cover" />
             </picture>
@@ -312,26 +301,31 @@ function HeroSection({ slides, content }: { slides: HeroSlide[]; content: Record
 
           {heroSlides.length > 1 ? (
             <>
-              <button type="button" onClick={goToPrevious} className="absolute left-4 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/35 bg-black/10 text-white transition hover:bg-black/20 lg:flex" aria-label="上一張投影片">
+              <button type="button" onClick={goToPrevious} className="absolute left-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center text-white transition hover:text-[#f8e0a2] md:left-5" aria-label="上一張投影片">
                 <ArrowLeft className="h-5 w-5" />
               </button>
-              <button type="button" onClick={goToNext} className="absolute right-4 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/35 bg-black/10 text-white transition hover:bg-black/20 lg:flex" aria-label="下一張投影片">
+              <button type="button" onClick={goToNext} className="absolute right-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center text-white transition hover:text-[#f8e0a2] md:right-5" aria-label="下一張投影片">
                 <ArrowRight className="h-5 w-5" />
               </button>
             </>
           ) : null}
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 flex justify-center gap-5 bg-[#b89b68] py-4 text-[#6a5440]">
-          {heroSlides.map((_, index) => (
-            <button
-              key={index}
-              type="button"
-              onClick={() => setActiveIndex(index)}
-              aria-label={`第 ${index + 1} 張投影片`}
-              className={index === activeIndex ? "h-3 w-3 rounded-full border border-[#3a3348] bg-[#8f8aa2]" : "h-3 w-3 rounded-full bg-[#72604d] opacity-75"}
-            />
-          ))}
+        <div className="absolute inset-x-0 bottom-5 z-10 flex justify-center">
+          <ol className="flex items-center gap-2 rounded-full bg-black/22 px-3 py-1.5 text-white/80 backdrop-blur-sm">
+            {heroSlides.map((_, index) => (
+              <li key={index}>
+                <button
+                  type="button"
+                  onClick={() => setActiveIndex(index)}
+                  aria-label={`第 ${index + 1} 張投影片，共 ${heroSlides.length} 張`}
+                  className={index === activeIndex ? "min-w-6 text-sm font-semibold text-white" : "min-w-6 text-sm text-white/65 transition hover:text-white"}
+                >
+                  {index + 1}
+                </button>
+              </li>
+            ))}
+          </ol>
         </div>
       </div>
     </section>
@@ -342,12 +336,12 @@ function StorySection({ content }: { content: StoryContent }) {
   const [showVideo, setShowVideo] = useState(false);
 
   return (
-    <section className="bg-[#a82727] text-white">
+    <section className="bg-white">
       <div className="storefront-page py-10 lg:py-12">
         <div className="mx-auto max-w-[1210px]">
-          <div className="storefront-prose max-w-none text-left text-[1.02rem] leading-[2.15] text-white lg:text-[1.06rem]" dangerouslySetInnerHTML={{ __html: content.body || "<p>內容待補。</p>" }} />
+          <div className="storefront-prose max-w-none text-left text-[1rem] leading-[2] text-[#38312b] lg:text-[1.02rem]" dangerouslySetInnerHTML={{ __html: content.body || "<p>內容待補。</p>" }} />
           {showVideo && content.videoUrl ? (
-            <div className="mt-8 overflow-hidden bg-black/30">
+            <div className="mt-8 overflow-hidden bg-black">
               <video controls autoPlay loop muted playsInline poster={content.videoPoster} className="aspect-[1.775/1] w-full object-cover">
                 <source src={content.videoUrl} type="video/mp4" />
               </video>
@@ -365,9 +359,12 @@ function StorySection({ content }: { content: StoryContent }) {
                 aria-label="載入影片：播放影片"
               >
                 <img src={content.videoPoster} alt="漢本品牌影片" className="aspect-[1.775/1] w-full object-cover" />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/16 transition group-hover:bg-black/24">
-                  <div className="flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full bg-white/92 text-[#bc2020] shadow-[0_10px_30px_rgba(0,0,0,0.18)] transition group-hover:scale-105">
-                    <Play className="ml-1 h-7 w-7" />
+                <div className="absolute inset-0 flex items-center justify-center bg-black/10 transition group-hover:bg-black/18">
+                  <div className="flex flex-col items-center gap-3 text-white">
+                    <div className="flex h-[4.4rem] w-[4.4rem] items-center justify-center rounded-full bg-white/92 text-[#161616] shadow-[0_10px_30px_rgba(0,0,0,0.18)] transition group-hover:scale-105">
+                      <Play className="ml-1 h-7 w-7" />
+                    </div>
+                    <span className="text-sm font-medium tracking-[0.06em]">播放影片</span>
                   </div>
                 </div>
               </button>
@@ -403,35 +400,31 @@ function StatsSection({ stats }: { stats: StatItem[] }) {
 
 function ProductCardView({ product }: { product: ProductCard }) {
   return (
-    <article className="group relative bg-white">
-      <div className="absolute right-5 top-5 z-10 rounded-full bg-[#111] px-3 py-1 text-[0.74rem] font-medium tracking-[0.08em] text-white">特賣</div>
+    <article className="group relative">
+      <Link href={`/products/${product.slug}`} className="absolute inset-0 z-10" aria-label={product.title} />
+      <div className="absolute right-3 top-3 z-20 rounded-full bg-[#111] px-2.5 py-1 text-[0.7rem] font-medium tracking-[0.08em] text-white">特賣</div>
       <div className="overflow-hidden bg-white">
         {product.imageUrl ? (
-          <div className="flex aspect-square w-full items-center justify-center bg-white px-8 py-8">
-            <img src={product.imageUrl} alt={product.imageAlt ?? product.title} className="h-full w-full object-contain transition duration-500 group-hover:scale-[1.03]" />
+          <div className="flex aspect-square w-full items-center justify-center bg-white p-3 sm:p-5">
+            <img src={product.imageUrl} alt={product.imageAlt ?? product.title} className="h-full w-full object-contain transition duration-500 group-hover:scale-[1.02]" />
           </div>
         ) : (
           <div className="flex aspect-square items-center justify-center px-6 text-center text-sm tracking-[0.12em] text-[#7a1414]">商品圖片待補</div>
         )}
       </div>
-      <div className="space-y-2 px-4 pb-2 pt-3 text-left lg:px-3">
-        <h3 className="text-[0.97rem] leading-7 text-[#201b17]">{product.title}</h3>
-        <div className="space-y-1 text-sm text-[#403730]">
-          <div className="flex items-center gap-2">
+      <div className="space-y-2 px-1 pb-1 pt-2 text-left">
+        <h3 className="text-[0.94rem] leading-[1.75] text-[#201b17] sm:text-[0.98rem]">{product.title}</h3>
+        <div className="space-y-1 text-[0.82rem] text-[#4b4138] sm:text-[0.88rem]">
+          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
             <span className="text-stone-500">促銷價</span>
-            <p className="text-[0.98rem] font-semibold text-[#1d1712]">{formatCurrency(product.price)}</p>
+            <p className="font-semibold text-[#1d1712]">{formatCurrency(product.price)}</p>
           </div>
           {product.compareAtPrice ? (
-            <div className="flex items-center gap-2 text-stone-400">
+            <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-stone-400">
               <span>定價</span>
               <p className="line-through">{formatCurrency(product.compareAtPrice)}</p>
             </div>
           ) : null}
-        </div>
-        <div className="pt-1">
-          <Link href={`/products/${product.slug}`} className="inline-flex h-10 items-center justify-center border border-[#201b17] px-5 text-sm text-[#201b17] transition hover:bg-[#201b17] hover:text-white">
-            選擇
-          </Link>
         </div>
       </div>
     </article>
@@ -441,12 +434,12 @@ function ProductCardView({ product }: { product: ProductCard }) {
 function ProductShowcaseSection({ title, products }: { title?: string | null; products: ProductCard[] }) {
   return (
     <section className="bg-white">
-      <div className="storefront-page py-14 lg:py-16">
+      <div className="storefront-page py-12 lg:py-14">
         <div className="text-center">
-          <h2 className="text-[1.78rem] font-medium tracking-[0.02em] text-[#231d19] lg:text-[1.95rem]">{title ?? "漢本三代舒活飲系列"}</h2>
+          <h2 className="text-[1.6rem] font-medium tracking-[0.02em] text-[#231d19] lg:text-[1.85rem]">{title ?? "漢本三代舒活飲系列"}</h2>
         </div>
 
-        <div className="mt-8 grid gap-x-5 gap-y-9 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 lg:grid-cols-3 lg:gap-x-2 lg:gap-y-10">
           {products.length > 0 ? (
             products.map((product) => <ProductCardView key={product.id} product={product} />)
           ) : (
@@ -465,17 +458,17 @@ function BrandCommitmentSection({ content }: { content: BrandCommitmentContent }
   const bodyLines = content.bodyLines && content.bodyLines.length > 0 ? content.bodyLines : defaultBrandCommitment.bodyLines ?? [];
 
   return (
-    <section className="bg-[#992928] text-white">
-      <div className="storefront-page py-12 text-left lg:py-14">
+    <section className="bg-white text-[#231d19]">
+      <div className="storefront-page py-14 text-left lg:py-16">
         <div className="max-w-[980px] space-y-3">
-          <div className="space-y-0.5 text-white">
+          <div className="space-y-0.5">
             {headingLines.map((line, index) => (
-              <h2 key={`${line}-${index}`} className="text-[1.55rem] font-semibold leading-[1.35] lg:text-[1.8rem]">
+              <h2 key={`${line}-${index}`} className="text-[1.4rem] font-semibold leading-[1.4] lg:text-[1.55rem]">
                 {line}
               </h2>
             ))}
           </div>
-          <div className="space-y-2 text-[1rem] leading-[1.9] text-white/92 lg:text-[1.05rem]">
+          <div className="space-y-2 text-[1rem] leading-[1.8] text-[#4f463f] lg:text-[1rem]">
             {bodyLines.map((line, index) => (
               <p key={`${line}-${index}`}>{line}</p>
             ))}
@@ -494,7 +487,7 @@ function FeatureMediaSection({ content }: { content: FeatureMediaContent }) {
       <div className="w-full overflow-hidden bg-black">
         {media.videoDesktop || media.videoMobile ? (
           <>
-            <video autoPlay loop muted playsInline poster={media.poster} className="hidden aspect-[16/6.86] w-full object-cover md:block">
+            <video autoPlay loop muted playsInline poster={media.poster} className="hidden aspect-[16/6.4] w-full object-cover md:block">
               {media.videoDesktop ? <source src={media.videoDesktop} type="video/mp4" /> : null}
             </video>
             <video autoPlay loop muted playsInline poster={media.poster} className="aspect-[16/10] w-full object-cover md:hidden">
@@ -504,7 +497,7 @@ function FeatureMediaSection({ content }: { content: FeatureMediaContent }) {
         ) : (
           <picture>
             {media.imageMobile ? <source media="(max-width: 767px)" srcSet={media.imageMobile} /> : null}
-            <img src={media.imageDesktop ?? media.poster} alt={media.alt ?? "漢本三代品牌影片"} className="aspect-[16/6.86] w-full object-cover" />
+            <img src={media.imageDesktop ?? media.poster} alt={media.alt ?? "漢本三代品牌影片"} className="aspect-[16/6.4] w-full object-cover" />
           </picture>
         )}
       </div>
@@ -597,10 +590,10 @@ function KnowledgeSection({ content }: { content: KnowledgeContent }) {
 
   return (
     <section className="bg-white">
-      <div className="storefront-page py-16 lg:py-14">
-        <div className="grid items-start gap-6 lg:grid-cols-[0.5fr_1fr_1fr]">
+      <div className="storefront-page py-14 lg:py-14">
+        <div className="grid items-start gap-8 lg:grid-cols-[0.46fr_1fr_1fr]">
           <div className="pt-3">
-            <h2 className="text-[2rem] font-semibold text-[#231d19]">{content.heading || defaultKnowledge.heading}</h2>
+            <h2 className="text-[1.9rem] font-semibold text-[#231d19]">{content.heading || defaultKnowledge.heading}</h2>
           </div>
 
           {articles.map((article, index) => {
@@ -609,10 +602,10 @@ function KnowledgeSection({ content }: { content: KnowledgeContent }) {
 
             return (
               <article key={`${article.title}-${index}`} className="space-y-4">
-                {article.imageUrl ? <img src={article.imageUrl} alt={article.imageAlt ?? article.title ?? ""} className="aspect-[2.15/1] w-full rounded-[8px] object-cover" /> : null}
+                {article.imageUrl ? <img src={article.imageUrl} alt={article.imageAlt ?? article.title ?? ""} className="aspect-[1.5/1] w-full rounded-[8px] object-cover" /> : null}
                 <div className="space-y-3">
-                  <h3 className="text-[1.2rem] font-semibold leading-8 text-[#231d19]">{article.title}</h3>
-                  <p className="text-[0.96rem] leading-7 text-[#544a44]">{article.excerpt}</p>
+                  <h3 className="text-[1.1rem] font-semibold leading-8 text-[#231d19]">{article.title}</h3>
+                  <p className="text-[0.95rem] leading-7 text-[#544a44]">{article.excerpt}</p>
                   <a
                     href={href}
                     target={external ? "_blank" : undefined}
@@ -652,13 +645,14 @@ export function Homepage({ slides, sections, featuredProducts }: { slides: HeroS
   const featuredLimit = Number.isFinite(rawFeaturedLimit) && rawFeaturedLimit > 0 ? rawFeaturedLimit : featuredProducts.length;
   const configuredProductOrder = asStringArray(productContent.productSlugs);
   const orderedFeaturedProducts = sortFeaturedProducts(featuredProducts, configuredProductOrder);
+  const homepageFeaturedProducts = orderedFeaturedProducts.slice(0, Math.min(orderedFeaturedProducts.length, Math.max(featuredLimit, 5)));
 
   return (
     <>
       <HeroSection slides={slides} content={heroContent} />
       <StorySection content={storyContent} />
       <StatsSection stats={stats} />
-      <ProductShowcaseSection title={(productContent.heading as string) || "漢本三代舒活飲系列"} products={orderedFeaturedProducts.slice(0, featuredLimit)} />
+      <ProductShowcaseSection title={(productContent.heading as string) || "漢本三代舒活飲系列"} products={homepageFeaturedProducts} />
       <BrandCommitmentSection content={{ headingLines: asStringArray(brandCommitmentContent.headingLines, defaultBrandCommitment.headingLines), bodyLines: asStringArray(brandCommitmentContent.bodyLines, defaultBrandCommitment.bodyLines) }} />
       <FeatureMediaSection content={featureMediaContent} />
       <BenefitsSection items={benefitItems} />
