@@ -16,7 +16,7 @@ declare global {
     gtag?: (...args: unknown[]) => void;
     fbq?: (...args: unknown[]) => void;
     __hanbenConsent?: TrackingConsentState | null;
-    __hanbenMetaPixelLoaded?: boolean;
+    __hanbenMetaPixelIds?: string[];
     __hanbenTracking?: ClientTrackingSettings;
   }
 }

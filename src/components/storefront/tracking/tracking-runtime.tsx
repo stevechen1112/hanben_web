@@ -13,14 +13,46 @@ import {
 
 type MetaPixelFunction = ((...args: unknown[]) => void) & {
   callMethod?: (...callArgs: unknown[]) => void;
+  getState?: () => {
+    pixels?: Array<{ id?: string }>;
+  };
   push?: (...args: unknown[]) => void;
   loaded?: boolean;
   queue?: unknown[];
   version?: string;
 };
 
+function getInitializedMetaPixelIds() {
+  const pixelFunction = window.fbq as MetaPixelFunction | undefined;
+
+  if (!pixelFunction?.getState) {
+    return [];
+  }
+
+  try {
+    const state = pixelFunction.getState();
+    return (state.pixels ?? [])
+      .map((pixel) => pixel.id?.trim())
+      .filter((pixelId): pixelId is string => Boolean(pixelId));
+  } catch {
+    return [];
+  }
+}
+
+function hasMetaPixelScript() {
+  return Boolean(
+    document.querySelector('script[src="https://connect.facebook.net/en_US/fbevents.js"]'),
+  );
+}
+
 function ensureMetaPixel(pixelId: string) {
-  if (window.__hanbenMetaPixelLoaded) {
+  if (
+    window.__hanbenMetaPixelIds?.includes(pixelId) ||
+    getInitializedMetaPixelIds().includes(pixelId)
+  ) {
+    window.__hanbenMetaPixelIds = Array.from(
+      new Set([...(window.__hanbenMetaPixelIds ?? []), pixelId]),
+    );
     return;
   }
 
@@ -44,13 +76,17 @@ function ensureMetaPixel(pixelId: string) {
   pixelFunction.version = "2.0";
   pixelFunction.queue = pixelFunction.queue || [];
 
-  const script = document.createElement("script");
-  script.async = true;
-  script.src = "https://connect.facebook.net/en_US/fbevents.js";
-  document.head.appendChild(script);
+  if (!hasMetaPixelScript()) {
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = "https://connect.facebook.net/en_US/fbevents.js";
+    document.head.appendChild(script);
+  }
 
   window.fbq("init", pixelId);
-  window.__hanbenMetaPixelLoaded = true;
+  window.__hanbenMetaPixelIds = Array.from(
+    new Set([...(window.__hanbenMetaPixelIds ?? []), pixelId]),
+  );
 }
 
 export function TrackingRuntime({
