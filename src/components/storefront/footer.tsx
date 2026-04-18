@@ -1,0 +1,81 @@
+import Link from "next/link";
+import type { StorefrontNavItem } from "@/lib/storefront";
+
+function PolicyLink({ item, label }: { item: StorefrontNavItem | null; label: string }) {
+  if (!item) {
+    return <span className="text-sm text-stone-400">{label}</span>;
+  }
+
+  if (item.isExternal) {
+    return (
+      <a href={item.url} target="_blank" rel="noreferrer" className="text-sm text-stone-500 transition hover:text-[#8f1212]">
+        {label}
+      </a>
+    );
+  }
+
+  return (
+    <Link href={item.url} className="text-sm text-stone-500 transition hover:text-[#8f1212]">
+      {label}
+    </Link>
+  );
+}
+
+export function StorefrontFooter({
+  siteName,
+  phone,
+  address,
+  serviceHours,
+  brandStatement,
+  brandSummary,
+  items,
+}: {
+  siteName: string;
+  phone: string;
+  address: string;
+  serviceHours: string;
+  brandStatement: string;
+  brandSummary: string;
+  items: StorefrontNavItem[];
+}) {
+  const policyItem = items.find((item) => item.url.includes("privacy") || item.url.includes("return-policy")) ?? items[0] ?? null;
+  const privacyItem = items.find((item) => item.url.includes("privacy")) ?? null;
+  const returnItem = items.find((item) => item.url.includes("return-policy")) ?? null;
+  const contactItem = items.find((item) => item.url.includes("contact")) ?? null;
+
+  return (
+    <>
+      <footer className="mt-16 text-stone-900">
+        <div className="bg-[linear-gradient(165deg,#bf953f_0%,#fcf6ba_25%,#aa771c_100%)]">
+          <div className="mx-auto max-w-[1200px] px-4 py-7 text-left sm:px-6 lg:px-8">
+            <p className="text-[1.25rem] font-medium leading-8 text-[rgba(32,32,32,0.81)]">{brandStatement}</p>
+            <p className="mt-1 text-[0.875rem] leading-[1.4] text-[rgba(32,32,32,0.81)]">{brandSummary}</p>
+            <p className="mt-1 text-[0.875rem] leading-[1.4] text-[rgba(32,32,32,0.81)]">
+              服務專線 : {phone}
+              <br />
+              服務時間 : {serviceHours}
+            </p>
+          </div>
+        </div>
+      </footer>
+
+      <div className="border-b border-[#efebe4] px-4 py-2 text-center text-[0.75rem] text-stone-600">
+        公司註冊地址：{address}
+      </div>
+
+      <div className="border-b border-[#efebe4] bg-white">
+        <div className="mx-auto flex max-w-[1200px] flex-col gap-3 px-4 py-8 text-[0.75rem] text-stone-500 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+          <p>
+            © 2026 <Link href="/" className="transition hover:text-[#8f1212]">{siteName}</Link>, 由 Shopify 技術支援
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+            <PolicyLink item={policyItem} label="條款及政策" />
+            <PolicyLink item={privacyItem} label="隱私政策" />
+            <PolicyLink item={returnItem} label="退款政策" />
+            <PolicyLink item={contactItem} label="聯絡資訊" />
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}

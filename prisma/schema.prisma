@@ -1,0 +1,472 @@
+// Prisma v7 schema - datasource URL 移至 prisma.config.ts
+// 文件: https://pris.ly/d/config-datasource
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ==================== 認證與會員 ====================
+
+model AdminUser {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  name          String
+  role          AdminRole @default(EDITOR)
+  auditLogs     AuditLog[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+}
+
+model Customer {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  passwordHash     String
+  firstName        String?
+  lastName         String?
+  phone            String?
+  note             String?   @db.Text
+  acceptsMarketing Boolean   @default(false)
+  addresses        Address[]
+  orders           Order[]
+  carts            Cart[]
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+model Address {
+  id            String   @id @default(cuid())
+  customerId    String
+  customer      Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  label         String?
+  recipientName String
+  phone         String
+  zipCode       String
+  city          String
+  district      String
+  addressLine   String
+  isDefault     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ==================== 商品系統 ====================
+
+model Product {
+  id             String              @id @default(cuid())
+  title          String
+  slug           String              @unique
+  description    String?             @db.Text
+  bodyHtml       String?             @db.Text
+  vendor         String?
+  productType    String?
+  status         ProductStatus       @default(DRAFT)
+  seoTitle       String?
+  seoDescription String?
+  tags           String[]
+  variants       Variant[]
+  images         ProductImage[]
+  collections    CollectionProduct[]
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+}
+
+enum ProductStatus {
+  ACTIVE
+  DRAFT
+  ARCHIVED
+}
+
+model Variant {
+  id             String      @id @default(cuid())
+  productId      String
+  product        Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  title          String
+  sku            String?     @unique
+  price          Decimal     @db.Decimal(10, 2)
+  compareAtPrice Decimal?    @db.Decimal(10, 2)
+  costPrice      Decimal?    @db.Decimal(10, 2)
+  inventory      Int         @default(0)
+  trackInventory Boolean     @default(true)
+  weight         Decimal?    @db.Decimal(8, 2)
+  weightUnit     String      @default("g")
+  sortOrder      Int         @default(0)
+  isActive       Boolean     @default(true)
+  orderItems     OrderItem[]
+  cartItems      CartItem[]
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  altText   String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+// ==================== 集合/分類 ====================
+
+model Collection {
+  id          String              @id @default(cuid())
+  title       String
+  slug        String              @unique
+  description String?             @db.Text
+  imageUrl    String?
+  sortOrder   Int                 @default(0)
+  isActive    Boolean             @default(true)
+  products    CollectionProduct[]
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+}
+
+model CollectionProduct {
+  id           String     @id @default(cuid())
+  collectionId String
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  productId    String
+  product      Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sortOrder    Int        @default(0)
+
+  @@unique([collectionId, productId])
+}
+
+// ==================== 內容管理 (CMS) ====================
+
+model Page {
+  id             String   @id @default(cuid())
+  title          String
+  slug           String   @unique
+  bodyHtml       String   @db.Text
+  content        Json     @default("{}")
+  seoTitle       String?
+  seoDescription String?
+  isPublished    Boolean  @default(false)
+  template       String   @default("default")
+  sortOrder      Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model BlogChannel {
+  id          String        @id @default(cuid())
+  title       String
+  slug        String        @unique
+  description String?
+  articles    BlogArticle[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model BlogArticle {
+  id             String      @id @default(cuid())
+  channelId      String
+  channel        BlogChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  title          String
+  slug           String
+  excerpt        String?     @db.Text
+  bodyHtml       String      @db.Text
+  content        Json        @default("{}")
+  featureImage   String?
+  author         String?
+  tags           String[]
+  isPublished    Boolean     @default(false)
+  publishedAt    DateTime?
+  seoTitle       String?
+  seoDescription String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@unique([channelId, slug])
+}
+
+model FaqItem {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String   @db.Text
+  category  String?
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ==================== 首頁區塊配置 ====================
+
+model HomepageSection {
+  id          String   @id @default(cuid())
+  sectionType String
+  title       String?
+  subtitle    String?
+  content     Json
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model HeroSlide {
+  id           String   @id @default(cuid())
+  title        String?
+  subtitle     String?
+  imageDesktop String
+  imageMobile  String?
+  ctaText      String?
+  ctaLink      String?
+  sortOrder    Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// ==================== 網站設定 ====================
+
+model SiteSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   @db.Text
+  type      String   @default("text")
+  group     String
+  label     String
+  updatedAt DateTime @updatedAt
+}
+
+model NavigationMenu {
+  id        String           @id @default(cuid())
+  location  String           @unique
+  items     NavigationItem[]
+  updatedAt DateTime         @updatedAt
+}
+
+model NavigationItem {
+  id         String          @id @default(cuid())
+  menuId     String
+  menu       NavigationMenu  @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  parentId   String?
+  parent     NavigationItem? @relation("SubItems", fields: [parentId], references: [id], onDelete: SetNull)
+  children   NavigationItem[] @relation("SubItems")
+  title      String
+  url        String
+  isExternal Boolean         @default(false)
+  sortOrder  Int             @default(0)
+}
+
+model AnnouncementBar {
+  id        String   @id @default(cuid())
+  text      String
+  link      String?
+  bgColor   String   @default("#C6974A")
+  textColor String   @default("#FFFFFF")
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ==================== 購物車 & 訂單 ====================
+
+model Cart {
+  id         String     @id @default(cuid())
+  customerId String?
+  customer   Customer?  @relation(fields: [customerId], references: [id])
+  sessionId  String?    @unique
+  items      CartItem[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  variantId String
+  variant   Variant  @relation(fields: [variantId], references: [id])
+  quantity  Int
+  createdAt DateTime @default(now())
+
+  @@unique([cartId, variantId])
+}
+
+model Order {
+  id               String         @id @default(cuid())
+  orderNumber      String         @unique
+  customerId       String?
+  customer         Customer?      @relation(fields: [customerId], references: [id])
+  email            String
+  phone            String?
+  status           OrderStatus    @default(PENDING)
+  paymentStatus    PaymentStatus  @default(UNPAID)
+  shippingStatus   ShippingStatus @default(UNFULFILLED)
+  subtotal         Decimal        @db.Decimal(10, 2)
+  shippingFee      Decimal        @db.Decimal(10, 2) @default(0)
+  discountAmount   Decimal        @db.Decimal(10, 2) @default(0)
+  total            Decimal        @db.Decimal(10, 2)
+  note             String?        @db.Text
+  shippingName     String
+  shippingPhone    String
+  shippingZip      String
+  shippingCity     String
+  shippingDistrict String
+  shippingAddress  String
+  paymentMethod    String?
+  paymentRef       String?
+  paidAt           DateTime?
+  shippingMethod   String?
+  logisticsId      String?
+  trackingNumber   String?
+  cvsStoreId       String?
+  cvsStoreName     String?
+  cvsStoreAddress  String?
+  shippedAt        DateTime?
+  deliveredAt      DateTime?
+  cancelledAt      DateTime?
+  cancelReason     String?
+  items            OrderItem[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+  PARTIALLY_REFUNDED
+  REFUNDED
+  FAILED
+}
+
+enum ShippingStatus {
+  UNFULFILLED
+  PARTIALLY_FULFILLED
+  FULFILLED
+  RETURNED
+}
+
+model OrderItem {
+  id           String  @id @default(cuid())
+  orderId      String
+  order        Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variantId    String
+  variant      Variant @relation(fields: [variantId], references: [id])
+  productTitle String
+  variantTitle String
+  sku          String?
+  quantity     Int
+  unitPrice    Decimal @db.Decimal(10, 2)
+  total        Decimal @db.Decimal(10, 2)
+}
+
+// ==================== 促銷系統 ====================
+
+model Promotion {
+  id             String        @id @default(cuid())
+  name           String
+  type           PromotionType
+  code           String?       @unique
+  discountType   DiscountType
+  discountValue  Decimal       @db.Decimal(10, 2)
+  minOrderAmount Decimal?      @db.Decimal(10, 2)
+  maxUses        Int?
+  usedCount      Int           @default(0)
+  startAt        DateTime
+  endAt          DateTime?
+  isActive       Boolean       @default(true)
+  createdAt      DateTime      @default(now())
+}
+
+enum PromotionType {
+  COUPON_CODE
+  AUTOMATIC
+  BUY_X_GET_Y
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+  FREE_SHIPPING
+}
+
+// ==================== 運費規則 ====================
+
+model ShippingRule {
+  id               String   @id @default(cuid())
+  name             String
+  shippingMethod   String
+  logisticsType    String
+  logisticsSubType String
+  temperature      String?
+  baseFee          Decimal  @db.Decimal(10, 2)
+  freeShippingMin  Decimal? @db.Decimal(10, 2)
+  codFee           Decimal? @db.Decimal(10, 2)
+  isActive         Boolean  @default(true)
+  sortOrder        Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+// ==================== 聯絡表單 ====================
+
+model ContactSubmission {
+  id        String    @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  message   String    @db.Text
+  isRead    Boolean   @default(false)
+  repliedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+// ==================== 媒體庫 ====================
+
+model MediaFile {
+  id        String   @id @default(cuid())
+  filename  String
+  url       String
+  mimeType  String
+  size      Int
+  width     Int?
+  height    Int?
+  altText   String?
+  folder    String   @default("/")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ==================== 操作日誌 ====================
+
+model AuditLog {
+  id        String    @id @default(cuid())
+  adminId   String
+  admin     AdminUser @relation(fields: [adminId], references: [id])
+  action    String
+  entity    String
+  entityId  String
+  changes   Json?
+  ipAddress String?
+  createdAt DateTime  @default(now())
+}
