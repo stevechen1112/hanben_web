@@ -6,6 +6,8 @@ import { FaqPage } from "@/components/storefront/faq-page";
 import { StorefrontContentTemplate } from "@/components/storefront/content-template";
 import { HerbalGuidePage } from "@/components/storefront/herbal-guide-page";
 import { LegalPage } from "@/components/storefront/legal-page";
+import { SoreDailyLifeArticlesPage } from "@/components/storefront/sore-daily-life-articles-page";
+import { SoreDailyLifePage } from "@/components/storefront/sore-daily-life-page";
 import { getPublishedPageBySlug } from "@/lib/storefront";
 import { parseStorefrontTemplateContent } from "@/lib/storefront-template";
 
@@ -60,6 +62,14 @@ export default async function StaticPage({ params }: { params: Promise<{ slug: s
 
   if (slug === "qa") {
     return <FaqPage title={page.title} bodyHtml={page.bodyHtml} />;
+  }
+
+  if (slug === "sore-daily-life") {
+    return <SoreDailyLifePage />;
+  }
+
+  if (slug === "sore-daily-life-articles") {
+    return <SoreDailyLifeArticlesPage />;
   }
 
   if (slug === "return-policy" || slug === "privacy") {

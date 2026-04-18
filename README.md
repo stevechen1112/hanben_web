@@ -146,6 +146,7 @@ npm run dev
 ```bash
 npm run dev            # 開發模式
 npm run build          # 產生 production build
+npm run build:linode   # Linode 低記憶體主機用 production build
 npm run start          # 啟動 production server
 npm run lint           # 執行 ESLint
 npm run format         # 格式化 src 下常用檔案
@@ -169,6 +170,23 @@ npm run content:replatform
 
 - 首頁公告列或首頁區塊調整後，`npm run build` 再 `npm run start`
 - 只跑 dev server 時，通常能直接看到最新資料
+
+### Linode 部署備註
+
+目前已驗證一台 `1 vCPU / 2 GB RAM` 的 Linode 會在預設 `next build` (Turbopack) 階段因記憶體壓力而不穩定；同一台機器改用 `npm run build:linode` 可穩定完成 build。
+
+若你是部署到目前這台 Linode，建議流程為：
+
+```bash
+npm ci --include=dev
+npm run db:generate
+npx prisma db push
+npm run db:seed
+npm run build:linode
+npm run start
+```
+
+若使用 systemd 管理服務，build 完成後改為重啟 service，而不是手動執行 `npm run start`。
 
 ### 後台入口
 

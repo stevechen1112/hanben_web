@@ -1,5 +1,20 @@
 # Hanben Admin Deployment
 
+## Linode Notes
+
+目前已實測的 Linode 主機規格為 `1 vCPU / 2 GB RAM`。在這個規格下，預設 `next build` (Turbopack) 可能會在 compile 階段直接失敗且沒有足夠可讀的錯誤輸出；改用 `npm run build:linode` (`next build --webpack`) 可穩定完成 build。
+
+如果沿用目前這台 Linode，建議部署順序如下：
+
+1. `npm ci --include=dev`
+2. `npm run db:generate`
+3. `npx prisma db push`
+4. `npm run db:seed`
+5. `npm run build:linode`
+6. `systemctl restart hanben-web`
+
+補充：目前 repo schema 仍領先既有 migration，所以正式機器若只跑 `prisma migrate deploy`，可能不會得到完整 schema；在補齊 migration 之前，Linode 仍應使用 `npx prisma db push`。
+
 ## Phase 6D Checklist
 
 1. Vercel
