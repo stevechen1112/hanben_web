@@ -67,8 +67,8 @@ export default async function EditProductPage({
   return (
     <div className="space-y-4">
       {/* 麵包屑 + 操作 */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm text-stone-500">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-wrap items-center gap-2 text-sm text-stone-500">
           <Link
             href="/admin/products"
             className="flex items-center gap-1.5 hover:text-stone-700 transition-colors"
@@ -85,11 +85,11 @@ export default async function EditProductPage({
           </span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <Link
             href={`/products/${product.slug}`}
             target="_blank"
-            className="flex items-center gap-1.5 rounded-lg border border-stone-200 px-3 py-1.5 text-xs text-stone-600 hover:bg-stone-50 transition-colors"
+            className="flex items-center justify-center gap-1.5 rounded-lg border border-stone-200 px-3 py-2 text-xs text-stone-600 hover:bg-stone-50 transition-colors"
           >
             <ExternalLink className="h-3.5 w-3.5" />
             前台預覽

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -18,7 +18,7 @@ import {
   Settings,
   ChevronDown,
   ChevronRight,
-  Layers,
+  X,
   PanelLeftClose,
   PanelLeft,
 } from "lucide-react";
@@ -75,10 +75,23 @@ const navItems: NavItem[] = [
   },
 ];
 
-export function AdminSidebar() {
+type AdminSidebarProps = {
+  mobile?: boolean;
+  onNavigate?: () => void;
+};
+
+export function AdminSidebar({ mobile = false, onNavigate }: AdminSidebarProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [openGroups, setOpenGroups] = useState<string[]>(["商品管理"]);
+
+  useEffect(() => {
+    const activeGroup = navItems
+      .filter((item) => item.children?.some((child) => isActive(child.href)))
+      .map((item) => item.title);
+
+    setOpenGroups((prev) => Array.from(new Set([...prev, ...activeGroup])));
+  }, [pathname]);
 
   function toggleGroup(title: string) {
     setOpenGroups((prev) =>
@@ -94,21 +107,23 @@ export function AdminSidebar() {
     return item.children?.some((c) => isActive(c.href)) ?? false;
   }
 
+  const isCollapsed = mobile ? false : collapsed;
+
   return (
     <aside
       className={cn(
-        "flex h-screen flex-col border-r border-stone-200 bg-white transition-all duration-200",
-        collapsed ? "w-16" : "w-60",
+        "flex h-full flex-col border-r border-stone-200 bg-white transition-all duration-200",
+        mobile ? "w-full shadow-2xl" : isCollapsed ? "w-16" : "w-60",
       )}
     >
       {/* Logo 區 */}
       <div
         className={cn(
           "flex h-14 items-center border-b border-stone-200 px-4",
-          collapsed ? "justify-center" : "justify-between",
+          isCollapsed ? "justify-center" : "justify-between",
         )}
       >
-        {!collapsed && (
+        {!isCollapsed && (
           <Link href="/admin/dashboard" className="flex items-center gap-2.5">
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#B72020]">
               <span className="text-xs font-bold text-white">漢</span>
@@ -118,26 +133,36 @@ export function AdminSidebar() {
             </span>
           </Link>
         )}
-        {collapsed && (
+        {isCollapsed && (
           <Link href="/admin/dashboard">
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#B72020]">
               <span className="text-xs font-bold text-white">漢</span>
             </div>
           </Link>
         )}
-        <button
-          onClick={() => setCollapsed((v) => !v)}
-          className={cn(
-            "rounded-md p-1 text-stone-400 hover:bg-stone-100 hover:text-stone-600 transition-colors",
-            collapsed && "mx-auto",
-          )}
-        >
-          {collapsed ? (
-            <PanelLeft className="h-4 w-4" />
-          ) : (
-            <PanelLeftClose className="h-4 w-4" />
-          )}
-        </button>
+        {mobile ? (
+          <button
+            type="button"
+            onClick={onNavigate}
+            className="rounded-md p-1 text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-600"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        ) : (
+          <button
+            onClick={() => setCollapsed((v) => !v)}
+            className={cn(
+              "rounded-md p-1 text-stone-400 hover:bg-stone-100 hover:text-stone-600 transition-colors",
+              isCollapsed && "mx-auto",
+            )}
+          >
+            {isCollapsed ? (
+              <PanelLeft className="h-4 w-4" />
+            ) : (
+              <PanelLeftClose className="h-4 w-4" />
+            )}
+          </button>
+        )}
       </div>
 
       {/* Navigation */}
@@ -160,7 +185,7 @@ export function AdminSidebar() {
                       groupActive
                         ? "bg-[#B72020]/8 text-[#B72020] font-medium"
                         : "text-stone-600 hover:bg-stone-100 hover:text-stone-800",
-                      collapsed && "justify-center",
+                      isCollapsed && "justify-center",
                     )}
                   >
                     <Icon
@@ -169,7 +194,7 @@ export function AdminSidebar() {
                         groupActive ? "text-[#B72020]" : "text-stone-500",
                       )}
                     />
-                    {!collapsed && (
+                    {!isCollapsed && (
                       <>
                         <span className="flex-1 text-left">{item.title}</span>
                         {isOpen ? (
@@ -182,12 +207,13 @@ export function AdminSidebar() {
                   </button>
 
                   {/* Sub-items */}
-                  {!collapsed && isOpen && (
+                  {!isCollapsed && isOpen && (
                     <ul className="mt-0.5 ml-4 space-y-0.5 border-l border-stone-100 pl-3">
                       {item.children.map((child) => (
                         <li key={child.href}>
                           <Link
                             href={child.href}
+                            onClick={onNavigate}
                             className={cn(
                               "block rounded-md px-2.5 py-1.5 text-[0.8125rem] transition-colors",
                               isActive(child.href)
@@ -216,8 +242,9 @@ export function AdminSidebar() {
                     active
                       ? "bg-[#B72020]/8 text-[#B72020] font-medium"
                       : "text-stone-600 hover:bg-stone-100 hover:text-stone-800",
-                    collapsed && "justify-center",
+                    isCollapsed && "justify-center",
                   )}
+                  onClick={onNavigate}
                 >
                   <Icon
                     className={cn(
@@ -225,7 +252,7 @@ export function AdminSidebar() {
                       active ? "text-[#B72020]" : "text-stone-500",
                     )}
                   />
-                  {!collapsed && <span>{item.title}</span>}
+                  {!isCollapsed && <span>{item.title}</span>}
                 </Link>
               </li>
             );
@@ -234,7 +261,7 @@ export function AdminSidebar() {
       </nav>
 
       {/* 底部版本資訊 */}
-      {!collapsed && (
+      {!isCollapsed && (
         <div className="border-t border-stone-100 px-4 py-3">
           <p className="text-[0.7rem] text-stone-400">漢本三代後台 v0.1.0</p>
         </div>

@@ -118,7 +118,7 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* 統計卡 */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
         {stats.map((s) => {
           const Icon = s.icon;
           const card = (
@@ -149,9 +149,9 @@ export default async function DashboardPage() {
       </div>
 
       {/* 圖表 + 快速操作 */}
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-4 xl:grid-cols-3">
         {/* 近 14 天營收圖 */}
-        <div className="lg:col-span-2 rounded-xl border border-stone-200 bg-white p-5 shadow-xs">
+        <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-xs sm:p-5 xl:col-span-2">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-sm font-semibold text-stone-700">
               近 14 天營收趨勢
@@ -162,7 +162,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* 快速操作 */}
-        <div className="rounded-xl border border-stone-200 bg-white p-5 shadow-xs">
+        <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-xs sm:p-5">
           <h2 className="mb-3 text-sm font-semibold text-stone-700">
             快速操作
           </h2>
@@ -210,7 +210,7 @@ export default async function DashboardPage() {
 
       {/* 最近訂單 */}
       <div className="rounded-xl border border-stone-200 bg-white shadow-xs">
-        <div className="flex items-center justify-between border-b border-stone-100 px-5 py-3.5">
+        <div className="flex items-center justify-between border-b border-stone-100 px-4 py-3.5 sm:px-5">
           <h2 className="text-sm font-semibold text-stone-700">最近訂單</h2>
           <Link
             href="/admin/orders"
@@ -225,7 +225,63 @@ export default async function DashboardPage() {
             尚無訂單資料
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+            <div className="divide-y divide-stone-100 lg:hidden">
+              {recentOrders.map((order) => {
+                const orderStatus =
+                  ORDER_STATUS_MAP[order.status] ?? ORDER_STATUS_MAP.PENDING;
+                const paymentStatus =
+                  PAYMENT_STATUS_MAP[order.paymentStatus] ??
+                  PAYMENT_STATUS_MAP.UNPAID;
+                const customerName = order.customer
+                  ? [order.customer.firstName, order.customer.lastName]
+                      .filter(Boolean)
+                      .join(" ") || order.email
+                  : order.email;
+
+                return (
+                  <Link
+                    key={order.id}
+                    href={`/admin/orders/${order.id}`}
+                    className="block px-4 py-4 transition-colors hover:bg-stone-50"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="font-mono text-xs font-semibold text-[#B72020]">
+                          #{order.orderNumber}
+                        </p>
+                        <p className="mt-1 text-sm font-medium text-stone-800">
+                          {customerName}
+                        </p>
+                        <p className="mt-1 text-xs text-stone-400">{order.email}</p>
+                      </div>
+                      <p className="shrink-0 text-xs font-semibold text-stone-800">
+                        NT$ {Number(order.total).toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <span
+                        className={`inline-flex rounded-full px-2 py-0.5 text-[0.7rem] font-medium ${orderStatus.color}`}
+                      >
+                        {orderStatus.label}
+                      </span>
+                      <span
+                        className={`inline-flex rounded-full px-2 py-0.5 text-[0.7rem] font-medium ${paymentStatus.color}`}
+                      >
+                        {paymentStatus.label}
+                      </span>
+                      <span className="text-xs text-stone-400">
+                        {format(new Date(order.createdAt), "MM/dd HH:mm", {
+                          locale: zhTW,
+                        })}
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+
+            <div className="hidden overflow-x-auto lg:block">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-stone-100">
@@ -305,7 +361,8 @@ export default async function DashboardPage() {
                 })}
               </tbody>
             </table>
-          </div>
+            </div>
+          </>
         )}
       </div>
     </div>

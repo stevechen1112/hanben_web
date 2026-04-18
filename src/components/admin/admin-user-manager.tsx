@@ -160,7 +160,7 @@ export function AdminUserManager({ admins, currentUserId }: AdminUserManagerProp
 
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-xs">
+      <section className="rounded-2xl border border-stone-200 bg-white p-4 shadow-xs sm:p-6">
         <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
           <div>
             <h2 className="text-lg font-semibold text-stone-800">新增管理員</h2>
@@ -255,14 +255,138 @@ export function AdminUserManager({ admins, currentUserId }: AdminUserManagerProp
       </section>
 
       <section className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-xs">
-        <div className="border-b border-stone-100 px-6 py-4">
+        <div className="border-b border-stone-100 px-4 py-4 sm:px-6">
           <h2 className="text-lg font-semibold text-stone-800">現有管理員</h2>
           <p className="mt-1 text-sm text-stone-500">
             可調整姓名、角色與密碼。自己的角色不能在這裡修改，也不能刪除自己。
           </p>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="divide-y divide-stone-100 lg:hidden">
+          {admins.map((admin) => {
+            const draft = drafts[admin.id];
+            const isSelf = admin.id === currentUserId;
+            const isRowPending = isPending && pendingRowId === admin.id;
+            const feedback = rowFeedback[admin.id];
+
+            return (
+              <div key={admin.id} className="space-y-4 px-4 py-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="break-all text-sm font-medium text-stone-800">{admin.email}</p>
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <span
+                        className={cn(
+                          "inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-medium",
+                          getRoleBadgeClass(admin.role),
+                        )}
+                      >
+                        {roleOptions.find((option) => option.value === admin.role)?.label}
+                      </span>
+                      {isSelf && (
+                        <span className="inline-flex items-center rounded-full border border-stone-200 bg-stone-100 px-2.5 py-1 text-[11px] font-medium text-stone-600">
+                          目前登入帳號
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <span className="shrink-0 text-xs text-stone-400">{admin.createdAtLabel}</span>
+                </div>
+
+                <div className="grid gap-3">
+                  <label className="space-y-1.5">
+                    <span className="text-xs font-medium text-stone-500">姓名</span>
+                    <input
+                      type="text"
+                      value={draft?.name ?? ""}
+                      onChange={(event) => updateDraft(admin.id, { name: event.target.value })}
+                      className="w-full rounded-xl border border-stone-300 px-3 py-2.5 text-sm outline-none transition-colors focus:border-stone-500"
+                    />
+                  </label>
+
+                  <label className="space-y-1.5">
+                    <span className="text-xs font-medium text-stone-500">角色</span>
+                    <select
+                      value={draft?.role ?? admin.role}
+                      disabled={isSelf}
+                      onChange={(event) =>
+                        updateDraft(admin.id, { role: event.target.value as AdminRole })
+                      }
+                      className="w-full rounded-xl border border-stone-300 px-3 py-2.5 text-sm outline-none transition-colors focus:border-stone-500 disabled:cursor-not-allowed disabled:bg-stone-100 disabled:text-stone-500"
+                    >
+                      {roleOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                    {isSelf && (
+                      <p className="text-xs text-stone-400">自己的角色不可在此頁修改</p>
+                    )}
+                  </label>
+
+                  <label className="space-y-1.5">
+                    <span className="text-xs font-medium text-stone-500">重設密碼</span>
+                    <div className="relative">
+                      <KeyRound className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
+                      <input
+                        type="password"
+                        value={draft?.password ?? ""}
+                        minLength={8}
+                        placeholder="留空代表不變更"
+                        onChange={(event) =>
+                          updateDraft(admin.id, { password: event.target.value })
+                        }
+                        className="w-full rounded-xl border border-stone-300 py-2.5 pl-9 pr-3 text-sm outline-none transition-colors focus:border-stone-500"
+                      />
+                    </div>
+                    <p className="text-xs text-stone-400">若要重設密碼，請輸入至少 8 個字元</p>
+                  </label>
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    disabled={isRowPending}
+                    onClick={() => handleSave(admin.id)}
+                    className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-stone-300 px-3 py-2 text-xs font-medium text-stone-700 transition-colors hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    <Save className="h-3.5 w-3.5" />
+                    {isRowPending ? "儲存中…" : "儲存"}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isSelf || isRowPending}
+                    onClick={() => handleDelete(admin.id, admin.name)}
+                    className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    刪除
+                  </button>
+                </div>
+
+                {feedback && (
+                  <p
+                    className={cn(
+                      "text-xs",
+                      feedback.type === "error" ? "text-red-600" : "text-emerald-600",
+                    )}
+                  >
+                    {feedback.message}
+                  </p>
+                )}
+              </div>
+            );
+          })}
+
+          {admins.length === 0 && (
+            <div className="px-5 py-10 text-center text-sm text-stone-400">
+              尚未建立任何管理員帳號
+            </div>
+          )}
+        </div>
+
+        <div className="hidden overflow-x-auto lg:block">
           <table className="w-full min-w-[980px] text-sm">
             <thead>
               <tr className="border-b border-stone-100 bg-stone-50/80">

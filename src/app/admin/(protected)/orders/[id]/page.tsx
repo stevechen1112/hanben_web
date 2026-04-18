@@ -48,8 +48,8 @@ export default async function OrderDetailPage({
   return (
     <div className="space-y-4">
       {/* 麵包屑 */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm text-stone-500">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-wrap items-center gap-2 text-sm text-stone-500">
           <Link href="/admin/orders" className="flex items-center gap-1.5 hover:text-stone-700 transition-colors">
             <ArrowLeft className="h-3.5 w-3.5" />
             訂單列表
@@ -63,7 +63,7 @@ export default async function OrderDetailPage({
             {payStatus.label}
           </span>
         </div>
-        <p className="text-xs text-stone-400">
+        <p className="text-xs text-stone-400 lg:text-right">
           {new Date(order.createdAt).toLocaleString("zh-TW")}
         </p>
       </div>
@@ -72,11 +72,50 @@ export default async function OrderDetailPage({
         {/* 主欄 */}
         <div className="space-y-4 lg:col-span-2">
           {/* 品項 */}
-          <div className="rounded-xl border border-stone-200 bg-white overflow-hidden">
+          <div className="overflow-hidden rounded-xl border border-stone-200 bg-white">
             <div className="border-b border-stone-100 px-5 py-3.5">
               <h2 className="text-sm font-semibold text-stone-700">訂單品項</h2>
             </div>
-            <table className="w-full text-sm">
+            <div className="divide-y divide-stone-100 md:hidden">
+              {order.items.map((item) => (
+                <div key={item.id} className="px-4 py-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-stone-800">{item.productTitle}</p>
+                      <p className="mt-1 text-xs text-stone-400">{item.variantTitle}</p>
+                      {item.sku && <p className="mt-1 text-xs text-stone-400">SKU: {item.sku}</p>}
+                    </div>
+                    <p className="shrink-0 text-sm font-semibold text-stone-800">× {item.quantity}</p>
+                  </div>
+                  <div className="mt-3 flex items-center justify-between text-xs text-stone-500">
+                    <span>單價 NT$ {Number(item.unitPrice).toLocaleString()}</span>
+                    <span className="font-semibold text-stone-700">小計 NT$ {Number(item.total).toLocaleString()}</span>
+                  </div>
+                </div>
+              ))}
+              <div className="space-y-2 bg-stone-50/50 px-4 py-4 text-xs">
+                <div className="flex items-center justify-between text-stone-500">
+                  <span>小計</span>
+                  <span>NT$ {Number(order.subtotal).toLocaleString()}</span>
+                </div>
+                <div className="flex items-center justify-between text-stone-500">
+                  <span>運費</span>
+                  <span>NT$ {Number(order.shippingFee).toLocaleString()}</span>
+                </div>
+                {Number(order.discountAmount) > 0 && (
+                  <div className="flex items-center justify-between text-green-600">
+                    <span>折扣</span>
+                    <span>-NT$ {Number(order.discountAmount).toLocaleString()}</span>
+                  </div>
+                )}
+                <div className="flex items-center justify-between border-t border-stone-200 pt-2 text-sm font-semibold text-stone-800">
+                  <span>合計</span>
+                  <span>NT$ {Number(order.total).toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+
+            <table className="hidden w-full text-sm md:table">
               <tbody>
                 {order.items.map((item) => (
                   <tr key={item.id} className="border-b border-stone-50 last:border-0">

@@ -38,7 +38,7 @@ export default async function CustomersPage({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="text-xl font-semibold text-stone-800">客戶管理</h1>
           <p className="mt-1 text-sm text-stone-500">檢視會員資料、歷史訂單與累計消費。</p>
@@ -49,7 +49,7 @@ export default async function CustomersPage({
             name="q"
             defaultValue={query}
             placeholder="搜尋 Email、姓名"
-            className="h-9 w-64 rounded-xl border border-stone-200 bg-white pl-8 pr-3 text-sm placeholder:text-stone-400 focus:border-[#B72020] focus:outline-none focus:ring-2 focus:ring-[#B72020]/20"
+            className="h-10 w-full rounded-xl border border-stone-200 bg-white pl-8 pr-3 text-sm placeholder:text-stone-400 focus:border-[#B72020] focus:outline-none focus:ring-2 focus:ring-[#B72020]/20 lg:w-72"
           />
         </form>
       </div>
@@ -61,6 +61,39 @@ export default async function CustomersPage({
             <p className="text-sm text-stone-500">找不到符合條件的客戶</p>
           </div>
         ) : (
+          <>
+            <div className="divide-y divide-stone-100 lg:hidden">
+              {customers.map((customer) => {
+                const name =
+                  [customer.firstName, customer.lastName].filter(Boolean).join(" ") || "未提供";
+                const spent = customer.orders.reduce((sum, order) => sum + Number(order.total), 0);
+
+                return (
+                  <Link
+                    key={customer.id}
+                    href={`/admin/customers/${customer.id}`}
+                    className="block px-4 py-4 transition-colors hover:bg-stone-50"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-stone-800">{name}</p>
+                        <p className="mt-1 truncate text-xs text-stone-400">{customer.email}</p>
+                      </div>
+                      <div className="text-right text-xs text-stone-500">
+                        <p>{customer._count.orders} 筆訂單</p>
+                        <p className="mt-1 font-semibold text-stone-700">NT$ {spent.toLocaleString()}</p>
+                      </div>
+                    </div>
+                    <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-stone-500">
+                      <span>電話：{customer.phone || "—"}</span>
+                      <span>{new Date(customer.createdAt).toLocaleDateString("zh-TW")}</span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+
+            <div className="hidden overflow-x-auto lg:block">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-stone-100">
@@ -95,6 +128,8 @@ export default async function CustomersPage({
               })}
             </tbody>
           </table>
+            </div>
+          </>
         )}
       </div>
     </div>

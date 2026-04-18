@@ -4,7 +4,7 @@ import { useSession, signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { Bell, LogOut, User, ExternalLink, ChevronDown } from "lucide-react";
+import { Bell, LogOut, User, ExternalLink, ChevronDown, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // 路徑 → 標題對應
@@ -39,7 +39,7 @@ function getPageTitle(pathname: string) {
   return "後台管理";
 }
 
-export function AdminTopBar() {
+export function AdminTopBar({ onMenuToggle }: { onMenuToggle?: () => void }) {
   const { data: session } = useSession();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -61,20 +61,39 @@ export function AdminTopBar() {
   const initial = name.charAt(0).toUpperCase();
 
   return (
-    <header className="flex h-14 items-center justify-between border-b border-stone-200 bg-white px-6">
+    <header className="flex h-14 items-center justify-between border-b border-stone-200 bg-white px-3 sm:px-4 lg:px-6">
       {/* 頁面標題 */}
-      <h1 className="text-sm font-semibold text-stone-800">{title}</h1>
+      <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+        <button
+          type="button"
+          onClick={onMenuToggle}
+          className="rounded-lg p-2 text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-700 lg:hidden"
+          aria-label="開啟導覽"
+        >
+          <Menu className="h-4 w-4" />
+        </button>
+        <h1 className="truncate text-sm font-semibold text-stone-800 sm:text-[15px]">{title}</h1>
+      </div>
 
       {/* 右側操作區 */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 sm:gap-2">
         {/* 前台預覽 */}
         <Link
           href="/"
           target="_blank"
-          className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-stone-500 hover:bg-stone-100 hover:text-stone-700 transition-colors"
+          className="hidden items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-stone-500 hover:bg-stone-100 hover:text-stone-700 transition-colors sm:flex"
         >
           <ExternalLink className="h-3.5 w-3.5" />
           前台預覽
+        </Link>
+
+        <Link
+          href="/"
+          target="_blank"
+          className="rounded-lg p-2 text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-700 sm:hidden"
+          aria-label="前台預覽"
+        >
+          <ExternalLink className="h-4 w-4" />
         </Link>
 
         {/* 通知 */}
@@ -86,7 +105,7 @@ export function AdminTopBar() {
         <div className="relative" ref={ref}>
           <button
             onClick={() => setOpen((v) => !v)}
-            className="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-stone-100 transition-colors"
+            className="flex items-center gap-2 rounded-lg px-1.5 py-1.5 hover:bg-stone-100 transition-colors sm:px-2"
           >
             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#B72020] text-xs font-semibold text-white">
               {initial}

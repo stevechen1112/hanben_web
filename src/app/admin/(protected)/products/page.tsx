@@ -91,8 +91,8 @@ export default async function ProductsPage({
   return (
     <div className="space-y-4">
       {/* 頁面操作列 */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
           {/* 搜尋框 */}
           <form method="GET" className="relative">
             <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-stone-400" />
@@ -100,7 +100,7 @@ export default async function ProductsPage({
               name="q"
               defaultValue={query}
               placeholder="搜尋商品名稱、Slug…"
-              className="h-8 w-64 rounded-lg border border-stone-200 bg-white pl-8 pr-3 text-sm placeholder:text-stone-400 focus:border-[#B72020] focus:outline-none focus:ring-2 focus:ring-[#B72020]/20"
+              className="h-10 w-full rounded-lg border border-stone-200 bg-white pl-8 pr-3 text-sm placeholder:text-stone-400 focus:border-[#B72020] focus:outline-none focus:ring-2 focus:ring-[#B72020]/20 xl:w-72"
             />
             {statusFilter && (
               <input type="hidden" name="status" value={statusFilter} />
@@ -109,7 +109,7 @@ export default async function ProductsPage({
           </form>
 
           {/* 狀態篩選 */}
-          <div className="flex items-center gap-1">
+          <div className="flex flex-wrap items-center gap-1.5">
             {(["", "ACTIVE", "DRAFT", "ARCHIVED"] as const).map((s) => (
               <Link
                 key={s}
@@ -138,7 +138,7 @@ export default async function ProductsPage({
 
         <Link
           href="/admin/products/new"
-          className="flex items-center gap-1.5 rounded-lg bg-[#B72020] px-3.5 py-2 text-sm font-medium text-white hover:bg-[#9e1c1c] transition-colors"
+          className="flex items-center justify-center gap-1.5 rounded-lg bg-[#B72020] px-3.5 py-2 text-sm font-medium text-white hover:bg-[#9e1c1c] transition-colors xl:justify-start"
         >
           <Plus className="h-4 w-4" />
           新增商品
@@ -163,6 +163,56 @@ export default async function ProductsPage({
             )}
           </div>
         ) : (
+          <>
+            <div className="divide-y divide-stone-100 lg:hidden">
+              {products.map((product) => {
+                const status =
+                  STATUS_MAP[product.status as keyof typeof STATUS_MAP];
+                const thumb = product.images[0];
+
+                return (
+                  <Link
+                    key={product.id}
+                    href={`/admin/products/${product.id}`}
+                    className="block px-4 py-4 transition-colors hover:bg-stone-50"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-stone-100 bg-stone-50">
+                        {thumb ? (
+                          <img
+                            src={thumb.url}
+                            alt={thumb.altText ?? product.title}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center">
+                            <Package className="h-5 w-5 text-stone-300" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-medium text-stone-800">{product.title}</p>
+                            <p className="mt-1 truncate text-xs text-stone-400">{product.slug}</p>
+                          </div>
+                          <span className={`inline-flex shrink-0 rounded-full px-2 py-0.5 text-[0.7rem] font-medium ${status?.className}`}>
+                            {status?.label}
+                          </span>
+                        </div>
+                        <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-stone-500">
+                          <span>品牌：{product.vendor ?? "—"}</span>
+                          <span>規格：{product._count.variants}</span>
+                          <span>{new Date(product.updatedAt).toLocaleDateString("zh-TW")}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+
+            <div className="hidden overflow-x-auto lg:block">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-stone-100">
@@ -254,11 +304,13 @@ export default async function ProductsPage({
               })}
             </tbody>
           </table>
+            </div>
+          </>
         )}
 
         {/* 分頁 */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-stone-100 px-5 py-3">
+          <div className="flex flex-col gap-3 border-t border-stone-100 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
             <p className="text-xs text-stone-400">
               共 {total} 筆，第 {page}/{totalPages} 頁
             </p>

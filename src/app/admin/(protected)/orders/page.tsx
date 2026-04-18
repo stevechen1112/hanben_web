@@ -98,21 +98,21 @@ export default async function OrdersPage({
   return (
     <div className="space-y-4">
       {/* 操作列 */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="space-y-3">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
           <form method="GET" className="relative">
             <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-stone-400" />
             <input
               name="q"
               defaultValue={query}
               placeholder="訂單編號、電子郵件…"
-              className="h-8 w-64 rounded-lg border border-stone-200 bg-white pl-8 pr-3 text-sm placeholder:text-stone-400 focus:border-[#B72020] focus:outline-none focus:ring-2 focus:ring-[#B72020]/20"
+              className="h-10 w-full rounded-lg border border-stone-200 bg-white pl-8 pr-3 text-sm placeholder:text-stone-400 focus:border-[#B72020] focus:outline-none focus:ring-2 focus:ring-[#B72020]/20 xl:w-72"
             />
             {statusFilter && <input type="hidden" name="status" value={statusFilter} />}
             {pendingShipmentFilter && <input type="hidden" name="filter" value="pending" />}
           </form>
 
-          <div className="flex items-center gap-1">
+          <div className="flex flex-wrap items-center gap-1.5">
             {(["", "PENDING", "CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"] as const).map((s) => (
               <Link
                 key={s}
@@ -150,7 +150,45 @@ export default async function OrdersPage({
             </p>
           </div>
         ) : (
-          <table className="w-full text-sm">
+          <>
+            <div className="divide-y divide-stone-100 lg:hidden">
+              {orders.map((order) => {
+                const orderStatus = ORDER_STATUS[order.status] ?? ORDER_STATUS.PENDING;
+                const payStatus = PAYMENT_STATUS[order.paymentStatus] ?? PAYMENT_STATUS.UNPAID;
+
+                return (
+                  <Link
+                    key={order.id}
+                    href={`/admin/orders/${order.id}`}
+                    className="block px-4 py-4 transition-colors hover:bg-stone-50"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="font-mono text-xs font-semibold text-[#B72020]">#{order.orderNumber}</p>
+                        <p className="mt-1 text-sm font-medium text-stone-800">{order.shippingName}</p>
+                        <p className="mt-1 truncate text-xs text-stone-400">{order.email}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-semibold text-stone-800">NT$ {Number(order.total).toLocaleString()}</p>
+                        <p className="mt-1 text-xs text-stone-400">{new Date(order.createdAt).toLocaleDateString("zh-TW")}</p>
+                      </div>
+                    </div>
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <span className={`inline-flex rounded-full px-2 py-0.5 text-[0.7rem] font-medium ${orderStatus.className}`}>
+                        {orderStatus.label}
+                      </span>
+                      <span className={`inline-flex rounded-full px-2 py-0.5 text-[0.7rem] font-medium ${payStatus.className}`}>
+                        {payStatus.label}
+                      </span>
+                      <span className="text-xs text-stone-400">{order._count.items} 項商品</span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+
+            <div className="hidden overflow-x-auto lg:block">
+            <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-stone-100">
                 <th className="px-5 py-3 text-left text-xs font-medium text-stone-500">訂單編號</th>
@@ -209,10 +247,12 @@ export default async function OrdersPage({
               })}
             </tbody>
           </table>
+            </div>
+          </>
         )}
 
         {totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-stone-100 px-5 py-3">
+          <div className="flex flex-col gap-3 border-t border-stone-100 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
             <p className="text-xs text-stone-400">共 {total} 筆，第 {page}/{totalPages} 頁</p>
             <div className="flex gap-1">
               {page > 1 && (
