@@ -46,7 +46,7 @@ const navItems: NavItem[] = [
     title: "內容管理",
     icon: FileText,
     children: [
-      { title: "靜態頁面", href: "/admin/content/pages" },
+      { title: "靜態頁面", href: "/admin/pages" },
       { title: "常見問題", href: "/admin/content/faq" },
     ],
   },

@@ -15,7 +15,8 @@ const routeTitles: Record<string, string> = {
   "/admin/products/new": "新增商品",
   "/admin/collections": "商品集合",
   "/admin/customers": "客戶管理",
-  "/admin/content/pages": "靜態頁面",
+  "/admin/pages": "靜態頁面",
+  "/admin/pages/new": "新增頁面",
   "/admin/content/faq": "常見問題",
   "/admin/blog/articles": "部落格文章",
   "/admin/blog/channels": "部落格分類",
@@ -37,6 +38,7 @@ function getPageTitle(pathname: string) {
   if (/^\/admin\/products\/[^/]+$/.test(pathname)) return "編輯商品";
   if (/^\/admin\/orders\/[^/]+$/.test(pathname)) return "訂單詳情";
   if (/^\/admin\/customers\/[^/]+$/.test(pathname)) return "客戶詳情";
+  if (/^\/admin\/pages\/[^/]+$/.test(pathname)) return "編輯頁面";
   return "後台管理";
 }
 
