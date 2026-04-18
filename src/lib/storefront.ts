@@ -27,6 +27,8 @@ export type ProductCard = {
   description: string | null;
   imageUrl: string | null;
   imageAlt: string | null;
+  variantId: string | null;
+  inventory: number;
   price: number | null;
   compareAtPrice: number | null;
 };
@@ -49,6 +51,8 @@ const productCardSelect = {
     orderBy: { sortOrder: "asc" },
     take: 1,
     select: {
+      id: true,
+      inventory: true,
       price: true,
       compareAtPrice: true,
     },
@@ -118,6 +122,8 @@ function mapProductCard(product: Prisma.ProductGetPayload<{ select: typeof produ
     description: product.description,
     imageUrl: product.images[0]?.url ?? null,
     imageAlt: product.images[0]?.altText ?? product.title,
+    variantId: product.variants[0]?.id ?? null,
+    inventory: product.variants[0]?.inventory ?? 0,
     price: toNumber(product.variants[0]?.price),
     compareAtPrice: toNumber(product.variants[0]?.compareAtPrice),
   };

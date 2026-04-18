@@ -93,6 +93,16 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             ) : null}
           </div>
         </div>
+
+        {product.variants.length > 0 ? (
+          <div className="border-t border-[#ece7de] pt-8 sm:pt-10">
+            <div className="mx-auto max-w-[760px] text-center">
+              <a href="#purchase-panel" className="storefront-button w-full sm:min-w-[360px] sm:w-auto sm:px-12">
+                加入購物車
+              </a>
+            </div>
+          </div>
+        ) : null}
       </div>
     </>
   );

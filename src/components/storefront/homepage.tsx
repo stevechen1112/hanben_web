@@ -1,9 +1,11 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Play } from "lucide-react";
 import type { HeroSlide, HomepageSection } from "@/generated/prisma/client";
+import { useCartStore } from "@/lib/cart-store";
 import { getManagedLegacyOfficialUrl } from "@/lib/legacy-official-media";
 import type { ProductCard } from "@/lib/storefront";
 
@@ -399,6 +401,29 @@ function StatsSection({ stats }: { stats: StatItem[] }) {
 }
 
 function ProductCardView({ product }: { product: ProductCard }) {
+  const router = useRouter();
+  const addItem = useCartStore((state) => state.addItem);
+  const [isPending, setIsPending] = useState(false);
+  const isSoldOut = !product.variantId || product.inventory <= 0;
+
+  async function handleAddToCart(event: React.MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!product.variantId || isPending || isSoldOut) {
+      return;
+    }
+
+    setIsPending(true);
+
+    try {
+      await addItem(product.variantId, 1);
+      router.refresh();
+    } finally {
+      setIsPending(false);
+    }
+  }
+
   return (
     <article className="group relative">
       <Link href={`/products/${product.slug}`} className="absolute inset-0 z-10" aria-label={product.title} />
@@ -425,6 +450,16 @@ function ProductCardView({ product }: { product: ProductCard }) {
               <p className="line-through">{formatCurrency(product.compareAtPrice)}</p>
             </div>
           ) : null}
+        </div>
+        <div className="relative z-20 pt-3">
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            disabled={isPending || isSoldOut}
+            className="storefront-button w-full px-4 py-3 text-[0.8rem] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isSoldOut ? "已售完" : isPending ? "加入中…" : "加入購物車"}
+          </button>
         </div>
       </div>
     </article>

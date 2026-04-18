@@ -114,7 +114,7 @@ export function ProductPurchaseForm({
   }
 
   return (
-    <div id={panelId} className="space-y-6">
+    <div id={panelId} className="scroll-mt-28 space-y-6">
       {variants.length > 1 ? (
         <div className="space-y-3">
           <p className="text-sm font-semibold tracking-[0.16em] text-stone-700">規格選擇</p>
@@ -180,7 +180,7 @@ export function ProductPurchaseForm({
             type="button"
             disabled={isPending || isSoldOut}
             onClick={() => commitAdd()}
-            className="inline-flex w-full items-center justify-center bg-[#111] px-6 py-4 text-sm font-semibold text-white transition hover:bg-[#2a2a2a] disabled:cursor-not-allowed disabled:opacity-50"
+            className="storefront-button w-full disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isPending ? "加入中…" : "加入購物車"}
           </button>
