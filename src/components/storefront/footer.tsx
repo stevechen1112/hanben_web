@@ -39,9 +39,6 @@ export function StorefrontFooter({
   items: StorefrontNavItem[];
 }) {
   const policyItem = items.find((item) => item.url.includes("privacy") || item.url.includes("return-policy")) ?? items[0] ?? null;
-  const privacyItem = items.find((item) => item.url.includes("privacy")) ?? null;
-  const returnItem = items.find((item) => item.url.includes("return-policy")) ?? null;
-  const contactItem = items.find((item) => item.url.includes("contact")) ?? null;
 
   return (
     <>
@@ -64,15 +61,12 @@ export function StorefrontFooter({
       </div>
 
       <div className="border-b border-[#efebe4] bg-white">
-        <div className="mx-auto flex max-w-[1200px] flex-col gap-3 px-4 py-8 text-[0.75rem] text-stone-500 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+        <div className="mx-auto flex max-w-[1200px] flex-col gap-4 px-4 py-8 text-[0.75rem] text-stone-500 sm:px-6 lg:px-8">
           <p>
             © 2026 <Link href="/" className="transition hover:text-[#8f1212]">{siteName}</Link>, 由 Shopify 技術支援
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+          <div className="flex items-center justify-center lg:justify-center">
             <PolicyLink item={policyItem} label="條款及政策" />
-            <PolicyLink item={privacyItem} label="隱私政策" />
-            <PolicyLink item={returnItem} label="退款政策" />
-            <PolicyLink item={contactItem} label="聯絡資訊" />
           </div>
         </div>
       </div>

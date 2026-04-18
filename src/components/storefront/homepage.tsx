@@ -207,7 +207,8 @@ function formatCurrency(value: number | null) {
   return new Intl.NumberFormat("zh-TW", {
     style: "currency",
     currency: "TWD",
-    maximumFractionDigits: 0,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(value);
 }
 
@@ -341,18 +342,18 @@ function StorySection({ content }: { content: StoryContent }) {
   const [showVideo, setShowVideo] = useState(false);
 
   return (
-    <section className="bg-white">
-      <div className="storefront-page py-14 lg:py-18">
-        <div className="mx-auto max-w-[980px]">
-          <div className="storefront-prose text-center text-[1.08rem] leading-[2.05] text-[#49413b]" dangerouslySetInnerHTML={{ __html: content.body || "<p>內容待補。</p>" }} />
+    <section className="bg-[#a82727] text-white">
+      <div className="storefront-page py-10 lg:py-12">
+        <div className="mx-auto max-w-[1210px]">
+          <div className="storefront-prose max-w-none text-left text-[1.02rem] leading-[2.15] text-white lg:text-[1.06rem]" dangerouslySetInnerHTML={{ __html: content.body || "<p>內容待補。</p>" }} />
           {showVideo && content.videoUrl ? (
-            <div className="mt-10 overflow-hidden border border-[#eadfce] bg-black shadow-[0_14px_40px_rgba(43,27,10,0.08)]">
+            <div className="mt-8 overflow-hidden bg-black/30">
               <video controls autoPlay loop muted playsInline poster={content.videoPoster} className="aspect-[1.775/1] w-full object-cover">
                 <source src={content.videoUrl} type="video/mp4" />
               </video>
             </div>
           ) : content.videoPoster ? (
-            <div className="mt-10">
+            <div className="mt-8">
               <button
                 type="button"
                 onClick={() => {
@@ -360,31 +361,17 @@ function StorySection({ content }: { content: StoryContent }) {
                     setShowVideo(true);
                   }
                 }}
-                className="group relative block w-full overflow-hidden border border-[#eadfce] shadow-[0_14px_40px_rgba(43,27,10,0.08)]"
+                className="group relative block w-full overflow-hidden"
                 aria-label="載入影片：播放影片"
               >
                 <img src={content.videoPoster} alt="漢本品牌影片" className="aspect-[1.775/1] w-full object-cover" />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/10">
+                <div className="absolute inset-0 flex items-center justify-center bg-black/16 transition group-hover:bg-black/24">
                   <div className="flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full bg-white/92 text-[#bc2020] shadow-[0_10px_30px_rgba(0,0,0,0.18)] transition group-hover:scale-105">
                     <Play className="ml-1 h-7 w-7" />
                   </div>
                 </div>
               </button>
-              {content.videoUrl ? (
-                <div className="mt-4 flex justify-center">
-                  <button
-                    type="button"
-                    onClick={() => setShowVideo(true)}
-                    className="inline-flex items-center gap-2 rounded-full border border-[#e1d2bb] px-5 py-2 text-sm font-medium text-[#5e4b39] transition hover:border-[#bc2020] hover:text-[#bc2020]"
-                  >
-                    載入影片：
-                    <span className="inline-flex items-center gap-1 text-[#bc2020]">
-                      播放影片
-                      <Play className="h-4 w-4" />
-                    </span>
-                  </button>
-                </div>
-              ) : null}
+              {content.videoUrl ? <div className="sr-only">載入影片：播放影片</div> : null}
             </div>
           ) : null}
         </div>
@@ -417,20 +404,22 @@ function StatsSection({ stats }: { stats: StatItem[] }) {
 function ProductCardView({ product }: { product: ProductCard }) {
   return (
     <article className="group relative bg-white">
-      <div className="absolute right-4 top-4 z-10 rounded-full bg-[#111] px-3 py-1 text-[0.73rem] font-medium tracking-[0.08em] text-white">特賣</div>
-      <div className="overflow-hidden bg-[#f7f4ee]">
+      <div className="absolute right-5 top-5 z-10 rounded-full bg-[#111] px-3 py-1 text-[0.74rem] font-medium tracking-[0.08em] text-white">特賣</div>
+      <div className="overflow-hidden bg-white">
         {product.imageUrl ? (
-          <img src={product.imageUrl} alt={product.imageAlt ?? product.title} className="aspect-[1.58/1] w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
+          <div className="flex aspect-square w-full items-center justify-center bg-white px-8 py-8">
+            <img src={product.imageUrl} alt={product.imageAlt ?? product.title} className="h-full w-full object-contain transition duration-500 group-hover:scale-[1.03]" />
+          </div>
         ) : (
-          <div className="flex aspect-[1.58/1] items-center justify-center px-6 text-center text-sm tracking-[0.12em] text-[#7a1414]">商品圖片待補</div>
+          <div className="flex aspect-square items-center justify-center px-6 text-center text-sm tracking-[0.12em] text-[#7a1414]">商品圖片待補</div>
         )}
       </div>
-      <div className="space-y-2 pt-3 text-left">
-        <h3 className="text-[0.98rem] leading-7 text-[#201b17]">{product.title}</h3>
+      <div className="space-y-2 px-4 pb-2 pt-3 text-left lg:px-3">
+        <h3 className="text-[0.97rem] leading-7 text-[#201b17]">{product.title}</h3>
         <div className="space-y-1 text-sm text-[#403730]">
           <div className="flex items-center gap-2">
             <span className="text-stone-500">促銷價</span>
-            <p className="text-[1rem] font-semibold text-[#1d1712]">{formatCurrency(product.price)}</p>
+            <p className="text-[0.98rem] font-semibold text-[#1d1712]">{formatCurrency(product.price)}</p>
           </div>
           {product.compareAtPrice ? (
             <div className="flex items-center gap-2 text-stone-400">
@@ -440,7 +429,7 @@ function ProductCardView({ product }: { product: ProductCard }) {
           ) : null}
         </div>
         <div className="pt-1">
-          <Link href={`/products/${product.slug}`} className="inline-flex h-9 items-center justify-center border border-[#201b17] px-4 text-sm text-[#201b17] transition hover:bg-[#201b17] hover:text-white">
+          <Link href={`/products/${product.slug}`} className="inline-flex h-10 items-center justify-center border border-[#201b17] px-5 text-sm text-[#201b17] transition hover:bg-[#201b17] hover:text-white">
             選擇
           </Link>
         </div>
@@ -454,10 +443,10 @@ function ProductShowcaseSection({ title, products }: { title?: string | null; pr
     <section className="bg-white">
       <div className="storefront-page py-14 lg:py-16">
         <div className="text-center">
-          <h2 className="text-[1.8rem] font-medium tracking-[0.02em] text-[#231d19]">{title ?? "漢本三代舒活飲系列"}</h2>
+          <h2 className="text-[1.78rem] font-medium tracking-[0.02em] text-[#231d19] lg:text-[1.95rem]">{title ?? "漢本三代舒活飲系列"}</h2>
         </div>
 
-        <div className="mt-9 grid gap-x-5 gap-y-7 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 grid gap-x-5 gap-y-9 md:grid-cols-2 lg:grid-cols-3">
           {products.length > 0 ? (
             products.map((product) => <ProductCardView key={product.id} product={product} />)
           ) : (
@@ -477,16 +466,16 @@ function BrandCommitmentSection({ content }: { content: BrandCommitmentContent }
 
   return (
     <section className="bg-[#992928] text-white">
-      <div className="storefront-page py-16 text-left">
-        <div className="mx-auto max-w-[760px] space-y-2.5">
+      <div className="storefront-page py-12 text-left lg:py-14">
+        <div className="max-w-[980px] space-y-3">
           <div className="space-y-0.5 text-white">
             {headingLines.map((line, index) => (
-              <h2 key={`${line}-${index}`} className="text-[1.32rem] font-semibold leading-[1.35] lg:text-[1.5rem]">
+              <h2 key={`${line}-${index}`} className="text-[1.55rem] font-semibold leading-[1.35] lg:text-[1.8rem]">
                 {line}
               </h2>
             ))}
           </div>
-          <div className="space-y-1 text-[0.94rem] leading-[1.7] text-white/92">
+          <div className="space-y-2 text-[1rem] leading-[1.9] text-white/92 lg:text-[1.05rem]">
             {bodyLines.map((line, index) => (
               <p key={`${line}-${index}`}>{line}</p>
             ))}
