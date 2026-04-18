@@ -336,12 +336,12 @@ function StorySection({ content }: { content: StoryContent }) {
   const [showVideo, setShowVideo] = useState(false);
 
   return (
-    <section className="bg-white">
+    <section className="bg-[#a62525] text-white">
       <div className="storefront-page py-10 lg:py-12">
         <div className="mx-auto max-w-[1210px]">
-          <div className="storefront-prose max-w-none text-left text-[1rem] leading-[2] text-[#38312b] lg:text-[1.02rem]" dangerouslySetInnerHTML={{ __html: content.body || "<p>內容待補。</p>" }} />
+          <div className="storefront-prose max-w-none text-left text-[1rem] leading-[2.05] text-white lg:text-[1.02rem] [&_p]:text-white [&_strong]:text-white" dangerouslySetInnerHTML={{ __html: content.body || "<p>內容待補。</p>" }} />
           {showVideo && content.videoUrl ? (
-            <div className="mt-8 overflow-hidden bg-black">
+            <div className="mt-8 overflow-hidden bg-black/20">
               <video controls autoPlay loop muted playsInline poster={content.videoPoster} className="aspect-[1.775/1] w-full object-cover">
                 <source src={content.videoUrl} type="video/mp4" />
               </video>
@@ -359,7 +359,7 @@ function StorySection({ content }: { content: StoryContent }) {
                 aria-label="載入影片：播放影片"
               >
                 <img src={content.videoPoster} alt="漢本品牌影片" className="aspect-[1.775/1] w-full object-cover" />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/10 transition group-hover:bg-black/18">
+                <div className="absolute inset-0 flex items-center justify-center bg-black/14 transition group-hover:bg-black/22">
                   <div className="flex flex-col items-center gap-3 text-white">
                     <div className="flex h-[4.4rem] w-[4.4rem] items-center justify-center rounded-full bg-white/92 text-[#161616] shadow-[0_10px_30px_rgba(0,0,0,0.18)] transition group-hover:scale-105">
                       <Play className="ml-1 h-7 w-7" />
