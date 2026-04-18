@@ -4,7 +4,7 @@ import { useSession, signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { Bell, LogOut, User, ExternalLink, ChevronDown, Menu } from "lucide-react";
+import { Bell, LogOut, Settings, ExternalLink, ChevronDown, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // 路徑 → 標題對應
@@ -24,6 +24,7 @@ const routeTitles: Record<string, string> = {
   "/admin/shipping": "物流設定",
   "/admin/media": "媒體庫",
   "/admin/contact": "聯絡表單",
+  "/admin/settings": "系統設定",
   "/admin/site-settings/general": "一般設定",
   "/admin/site-settings/tracking": "追蹤 / 廣告",
   "/admin/site-settings/navigation": "導覽選單",
@@ -140,10 +141,14 @@ export function AdminTopBar({ onMenuToggle }: { onMenuToggle?: () => void }) {
                 <p className="text-xs text-stone-400 mt-0.5">{email}</p>
               </div>
               <div className="px-1.5 py-1">
-                <button className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-stone-600 hover:bg-stone-100 transition-colors">
-                  <User className="h-4 w-4" />
-                  帳號設定
-                </button>
+                <Link
+                  href="/admin/settings"
+                  onClick={() => setOpen(false)}
+                  className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-stone-600 hover:bg-stone-100 transition-colors"
+                >
+                  <Settings className="h-4 w-4" />
+                  系統設定
+                </Link>
                 <button
                   onClick={() => signOut({ callbackUrl: "/admin/login" })}
                   className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
