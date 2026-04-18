@@ -37,14 +37,14 @@ export function SettingsGroup({ title, fields }: SettingsGroupProps) {
   }
 
   return (
-    <div className="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 rounded-xl border border-stone-200 bg-white p-4 sm:p-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-sm font-semibold text-stone-700">{title}</h2>
         <button
           type="button"
           onClick={handleSave}
           disabled={isPending}
-          className="rounded-lg bg-stone-800 px-4 py-1.5 text-xs font-medium text-white hover:bg-stone-700 disabled:opacity-50 transition-colors"
+          className="rounded-lg bg-stone-800 px-4 py-2 text-xs font-medium text-white hover:bg-stone-700 disabled:opacity-50 transition-colors"
         >
           {isPending ? "儲存中…" : "儲存"}
         </button>

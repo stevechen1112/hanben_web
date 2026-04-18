@@ -33,7 +33,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2 text-sm text-stone-500">
+      <div className="flex flex-wrap items-center gap-2 text-sm text-stone-500">
         <Link href="/admin/customers" className="flex items-center gap-1.5 hover:text-stone-700">
           <ArrowLeft className="h-3.5 w-3.5" /> 客戶列表
         </Link>
@@ -91,30 +91,51 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             {customer.orders.length === 0 ? (
               <div className="px-5 py-8 text-xs text-stone-400">目前沒有訂單</div>
             ) : (
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-stone-100">
-                    <th className="px-5 py-3 text-left text-xs font-medium text-stone-500">訂單編號</th>
-                    <th className="px-5 py-3 text-left text-xs font-medium text-stone-500">狀態</th>
-                    <th className="px-5 py-3 text-left text-xs font-medium text-stone-500">付款</th>
-                    <th className="px-5 py-3 text-right text-xs font-medium text-stone-500">金額</th>
-                    <th className="px-5 py-3 text-right text-xs font-medium text-stone-500">日期</th>
-                  </tr>
-                </thead>
-                <tbody>
+              <>
+                <div className="divide-y divide-stone-100 md:hidden">
                   {customer.orders.map((order) => (
-                    <tr key={order.id} className="border-b border-stone-50 last:border-0 hover:bg-stone-50/50">
-                      <td className="px-5 py-3 text-xs font-medium text-[#B72020]">
-                        <Link href={`/admin/orders/${order.id}`}>#{order.orderNumber}</Link>
-                      </td>
-                      <td className="px-5 py-3 text-xs text-stone-500">{order.status}</td>
-                      <td className="px-5 py-3 text-xs text-stone-500">{order.paymentStatus}</td>
-                      <td className="px-5 py-3 text-right text-xs font-medium text-stone-700">NT$ {Number(order.total).toLocaleString()}</td>
-                      <td className="px-5 py-3 text-right text-xs text-stone-400">{new Date(order.createdAt).toLocaleDateString("zh-TW")}</td>
-                    </tr>
+                    <Link
+                      key={order.id}
+                      href={`/admin/orders/${order.id}`}
+                      className="block px-4 py-4 transition-colors hover:bg-stone-50"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="font-mono text-xs font-semibold text-[#B72020]">#{order.orderNumber}</p>
+                          <p className="mt-1 text-xs text-stone-500">{order.status} / {order.paymentStatus}</p>
+                        </div>
+                        <p className="text-sm font-semibold text-stone-700">NT$ {Number(order.total).toLocaleString()}</p>
+                      </div>
+                      <p className="mt-3 text-xs text-stone-400">{new Date(order.createdAt).toLocaleDateString("zh-TW")}</p>
+                    </Link>
                   ))}
-                </tbody>
-              </table>
+                </div>
+
+                <table className="hidden w-full text-sm md:table">
+                  <thead>
+                    <tr className="border-b border-stone-100">
+                      <th className="px-5 py-3 text-left text-xs font-medium text-stone-500">訂單編號</th>
+                      <th className="px-5 py-3 text-left text-xs font-medium text-stone-500">狀態</th>
+                      <th className="px-5 py-3 text-left text-xs font-medium text-stone-500">付款</th>
+                      <th className="px-5 py-3 text-right text-xs font-medium text-stone-500">金額</th>
+                      <th className="px-5 py-3 text-right text-xs font-medium text-stone-500">日期</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {customer.orders.map((order) => (
+                      <tr key={order.id} className="border-b border-stone-50 last:border-0 hover:bg-stone-50/50">
+                        <td className="px-5 py-3 text-xs font-medium text-[#B72020]">
+                          <Link href={`/admin/orders/${order.id}`}>#{order.orderNumber}</Link>
+                        </td>
+                        <td className="px-5 py-3 text-xs text-stone-500">{order.status}</td>
+                        <td className="px-5 py-3 text-xs text-stone-500">{order.paymentStatus}</td>
+                        <td className="px-5 py-3 text-right text-xs font-medium text-stone-700">NT$ {Number(order.total).toLocaleString()}</td>
+                        <td className="px-5 py-3 text-right text-xs text-stone-400">{new Date(order.createdAt).toLocaleDateString("zh-TW")}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </>
             )}
           </div>
         </div>
@@ -131,7 +152,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             />
             <button
               type="submit"
-              className="rounded-full bg-[#B72020] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#9a1a1a]"
+              className="w-full rounded-full bg-[#B72020] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#9a1a1a] sm:w-auto"
             >
               儲存備註
             </button>

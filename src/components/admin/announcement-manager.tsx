@@ -108,7 +108,7 @@ function AnnouncementForm({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label className="block text-xs font-medium text-stone-500 mb-1">背景顏色</label>
               <div className="flex items-center gap-2">
@@ -145,7 +145,7 @@ function AnnouncementForm({
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
             <div>
               <label className="block text-xs font-medium text-stone-500 mb-1">排序</label>
               <input
@@ -156,7 +156,7 @@ function AnnouncementForm({
                 className="w-20 rounded-lg border border-stone-300 px-3 py-2 text-sm outline-none focus:border-stone-500"
               />
             </div>
-            <div className="flex items-center gap-2 pt-5">
+            <div className="flex items-center gap-2 sm:pt-5">
               <input type="hidden" name="isActive" value="false" />
               <input
                 type="checkbox"
@@ -206,7 +206,7 @@ function SortableBar({
     <div
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.4 : 1 }}
-      className="flex items-center gap-3 rounded-xl border border-stone-200 bg-white px-4 py-3"
+      className="flex flex-col items-stretch gap-3 rounded-xl border border-stone-200 bg-white px-4 py-3 sm:flex-row sm:items-center"
     >
       <button type="button" {...attributes} {...listeners} className="cursor-grab text-stone-300 hover:text-stone-400 shrink-0">
         <GripVertical className="h-4 w-4" />

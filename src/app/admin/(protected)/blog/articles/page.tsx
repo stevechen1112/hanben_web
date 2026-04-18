@@ -52,20 +52,20 @@ export default async function ArticlesPage({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
           <form method="GET" className="relative">
             <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-stone-400" />
             <input
               name="q"
               defaultValue={query}
               placeholder="搜尋文章標題…"
-              className="h-8 w-52 rounded-lg border border-stone-200 bg-white pl-8 pr-3 text-sm placeholder:text-stone-400 focus:border-[#B72020] focus:outline-none focus:ring-2 focus:ring-[#B72020]/20"
+              className="h-10 w-full rounded-lg border border-stone-200 bg-white pl-8 pr-3 text-sm placeholder:text-stone-400 focus:border-[#B72020] focus:outline-none focus:ring-2 focus:ring-[#B72020]/20 xl:w-64"
             />
             {channelFilter && <input type="hidden" name="channel" value={channelFilter} />}
           </form>
 
-          <div className="flex items-center gap-1">
+          <div className="flex flex-wrap items-center gap-1.5">
             <Link
               href="/admin/blog/articles"
               className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${!channelFilter ? "bg-stone-800 text-white" : "text-stone-500 hover:bg-stone-100"}`}
@@ -86,7 +86,7 @@ export default async function ArticlesPage({
 
         <Link
           href="/admin/blog/articles/new"
-          className="flex items-center gap-1.5 rounded-lg bg-[#B72020] px-3.5 py-2 text-sm font-medium text-white hover:bg-[#9e1c1c] transition-colors"
+          className="flex items-center justify-center gap-1.5 rounded-lg bg-[#B72020] px-3.5 py-2 text-sm font-medium text-white hover:bg-[#9e1c1c] transition-colors xl:justify-start"
         >
           <Plus className="h-4 w-4" />
           新增文章
@@ -102,51 +102,80 @@ export default async function ArticlesPage({
             </p>
           </div>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-stone-100">
-                <th className="px-5 py-3 text-left text-xs font-medium text-stone-500">文章標題</th>
-                <th className="px-5 py-3 text-left text-xs font-medium text-stone-500">頻道</th>
-                <th className="px-5 py-3 text-left text-xs font-medium text-stone-500">作者</th>
-                <th className="px-5 py-3 text-left text-xs font-medium text-stone-500">狀態</th>
-                <th className="px-5 py-3 text-right text-xs font-medium text-stone-500">發布時間</th>
-              </tr>
-            </thead>
-            <tbody>
+          <>
+            <div className="divide-y divide-stone-100 lg:hidden">
               {articles.map((article) => (
-                <tr
+                <Link
                   key={article.id}
-                  className="border-b border-stone-50 last:border-0 hover:bg-stone-50/50 transition-colors"
+                  href={`/admin/blog/articles/${article.id}`}
+                  className="block px-4 py-4 transition-colors hover:bg-stone-50"
                 >
-                  <td className="px-5 py-3">
-                    <Link
-                      href={`/admin/blog/articles/${article.id}`}
-                      className="font-medium text-stone-800 hover:text-[#B72020] transition-colors"
-                    >
-                      {article.title}
-                    </Link>
-                    <p className="text-xs text-stone-400">{article.slug}</p>
-                  </td>
-                  <td className="px-5 py-3 text-xs text-stone-500">{article.channel.title}</td>
-                  <td className="px-5 py-3 text-xs text-stone-500">{article.author ?? "—"}</td>
-                  <td className="px-5 py-3">
-                    <span className={`inline-flex rounded-full px-2 py-0.5 text-[0.7rem] font-medium ${article.isPublished ? "bg-green-100 text-green-700" : "bg-stone-100 text-stone-500"}`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-stone-800">{article.title}</p>
+                      <p className="mt-1 truncate text-xs text-stone-400">{article.slug}</p>
+                    </div>
+                    <span className={`inline-flex shrink-0 rounded-full px-2 py-0.5 text-[0.7rem] font-medium ${article.isPublished ? "bg-green-100 text-green-700" : "bg-stone-100 text-stone-500"}`}>
                       {article.isPublished ? "已發布" : "草稿"}
                     </span>
-                  </td>
-                  <td className="px-5 py-3 text-right text-xs text-stone-400">
-                    {article.publishedAt
-                      ? new Date(article.publishedAt).toLocaleDateString("zh-TW")
-                      : "—"}
-                  </td>
-                </tr>
+                  </div>
+                  <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-stone-500">
+                    <span>{article.channel.title}</span>
+                    <span>{article.author ?? "—"}</span>
+                    <span>{article.publishedAt ? new Date(article.publishedAt).toLocaleDateString("zh-TW") : "—"}</span>
+                  </div>
+                </Link>
               ))}
-            </tbody>
-          </table>
+            </div>
+
+            <div className="hidden overflow-x-auto lg:block">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-stone-100">
+                    <th className="px-5 py-3 text-left text-xs font-medium text-stone-500">文章標題</th>
+                    <th className="px-5 py-3 text-left text-xs font-medium text-stone-500">頻道</th>
+                    <th className="px-5 py-3 text-left text-xs font-medium text-stone-500">作者</th>
+                    <th className="px-5 py-3 text-left text-xs font-medium text-stone-500">狀態</th>
+                    <th className="px-5 py-3 text-right text-xs font-medium text-stone-500">發布時間</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {articles.map((article) => (
+                    <tr
+                      key={article.id}
+                      className="border-b border-stone-50 last:border-0 hover:bg-stone-50/50 transition-colors"
+                    >
+                      <td className="px-5 py-3">
+                        <Link
+                          href={`/admin/blog/articles/${article.id}`}
+                          className="font-medium text-stone-800 hover:text-[#B72020] transition-colors"
+                        >
+                          {article.title}
+                        </Link>
+                        <p className="text-xs text-stone-400">{article.slug}</p>
+                      </td>
+                      <td className="px-5 py-3 text-xs text-stone-500">{article.channel.title}</td>
+                      <td className="px-5 py-3 text-xs text-stone-500">{article.author ?? "—"}</td>
+                      <td className="px-5 py-3">
+                        <span className={`inline-flex rounded-full px-2 py-0.5 text-[0.7rem] font-medium ${article.isPublished ? "bg-green-100 text-green-700" : "bg-stone-100 text-stone-500"}`}>
+                          {article.isPublished ? "已發布" : "草稿"}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3 text-right text-xs text-stone-400">
+                        {article.publishedAt
+                          ? new Date(article.publishedAt).toLocaleDateString("zh-TW")
+                          : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
 
         {totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-stone-100 px-5 py-3">
+          <div className="flex flex-col gap-3 border-t border-stone-100 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
             <p className="text-xs text-stone-400">共 {total} 篇</p>
             <div className="flex gap-1">
               {page > 1 && (

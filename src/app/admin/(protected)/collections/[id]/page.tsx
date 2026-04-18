@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Trash2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { db } from "@/lib/db";
 import { CollectionForm } from "@/components/admin/collection-form";
 import { updateCollection, deleteCollection } from "@/lib/actions/collections";
+import { ConfirmSubmitButton } from "@/components/admin/confirm-submit-button";
 
 export const metadata = { title: "編輯集合" };
 
@@ -79,8 +80,8 @@ export default async function EditCollectionPage({
   return (
     <div className="space-y-4">
       {/* 麵包屑 */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm text-stone-500">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-wrap items-center gap-2 text-sm text-stone-500">
           <Link
             href="/admin/collections"
             className="flex items-center gap-1.5 hover:text-stone-700 transition-colors"
@@ -99,17 +100,11 @@ export default async function EditCollectionPage({
             await deleteCollection(id);
           }}
         >
-          <button
-            type="submit"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors"
-            onClick={(e) => {
-              if (!confirm(`確定要刪除「${collection.title}」嗎？此操作無法復原。`))
-                e.preventDefault();
-            }}
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-            刪除集合
-          </button>
+          <ConfirmSubmitButton
+            label="刪除集合"
+            confirmMessage={`確定要刪除「${collection.title}」嗎？此操作無法復原。`}
+            className="w-full sm:w-auto"
+          />
         </form>
       </div>
 

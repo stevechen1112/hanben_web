@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { deletePromotion, savePromotion } from "@/lib/actions/promotions";
 import { db } from "@/lib/db";
+import { ConfirmSubmitButton } from "@/components/admin/confirm-submit-button";
 
 export default async function PromotionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -9,8 +10,19 @@ export default async function PromotionDetailPage({ params }: { params: Promise<
 
   return (
     <div className="mx-auto max-w-3xl space-y-4">
-      <h1 className="text-xl font-semibold text-stone-800">{promotion ? "編輯促銷" : "新增促銷"}</h1>
-      <form action={savePromotion} className="rounded-xl border border-stone-200 bg-white p-6 shadow-xs">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-xl font-semibold text-stone-800">{promotion ? "編輯促銷" : "新增促銷"}</h1>
+        {promotion ? (
+          <form action={deletePromotion.bind(null, promotion.id)}>
+            <ConfirmSubmitButton
+              label="刪除促銷"
+              confirmMessage="確定要刪除此促銷？"
+              className="w-full sm:w-auto"
+            />
+          </form>
+        ) : null}
+      </div>
+      <form action={savePromotion} className="rounded-xl border border-stone-200 bg-white p-4 shadow-xs sm:p-6">
         {promotion && <input type="hidden" name="id" value={promotion.id} />}
         <div className="grid gap-4 sm:grid-cols-2">
           <input name="name" defaultValue={promotion?.name || ""} placeholder="促銷名稱" className="rounded-2xl border border-stone-200 px-4 py-3 text-sm" />
@@ -32,13 +44,8 @@ export default async function PromotionDetailPage({ params }: { params: Promise<
           <input name="endAt" type="datetime-local" defaultValue={promotion?.endAt ? new Date(promotion.endAt.getTime() - promotion.endAt.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""} className="rounded-2xl border border-stone-200 px-4 py-3 text-sm" />
         </div>
         <label className="mt-4 flex items-center gap-2 text-sm text-stone-600"><input name="isActive" type="checkbox" defaultChecked={promotion?.isActive ?? true} /> 啟用此促銷</label>
-        <div className="mt-6 flex items-center gap-3">
+        <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:items-center">
           <button type="submit" className="rounded-full bg-[#B72020] px-5 py-3 text-sm font-semibold text-white">儲存促銷</button>
-          {promotion && (
-            <form action={deletePromotion.bind(null, promotion.id)}>
-              <button type="submit" className="rounded-full border border-red-200 px-5 py-3 text-sm font-semibold text-red-700">刪除</button>
-            </form>
-          )}
         </div>
       </form>
     </div>

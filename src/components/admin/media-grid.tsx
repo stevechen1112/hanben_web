@@ -85,9 +85,9 @@ function MediaDetailPanel({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-end bg-black/20" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/20 md:items-stretch md:justify-end" onClick={onClose}>
       <div
-        className="h-full w-80 bg-white border-l border-stone-200 shadow-xl overflow-y-auto"
+        className="h-[min(85vh,720px)] w-full max-w-2xl overflow-y-auto rounded-t-2xl bg-white shadow-xl md:h-full md:w-80 md:max-w-none md:rounded-none md:border-l md:border-stone-200"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-stone-100 px-4 py-3">
@@ -249,9 +249,9 @@ export function MediaGrid({ items: initialItems, folders }: MediaGridProps) {
   return (
     <div className="space-y-4">
       {/* 工具列 */}
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
         {/* 搜尋 */}
-        <div className="flex items-center gap-2 rounded-lg border border-stone-300 px-3 py-2 focus-within:border-stone-500 focus-within:ring-2 focus-within:ring-stone-100 min-w-48">
+        <div className="flex w-full items-center gap-2 rounded-lg border border-stone-300 px-3 py-2 focus-within:border-stone-500 focus-within:ring-2 focus-within:ring-stone-100 sm:min-w-48 sm:flex-1">
           <Search className="h-4 w-4 text-stone-400 shrink-0" />
           <input
             type="text"
@@ -266,7 +266,7 @@ export function MediaGrid({ items: initialItems, folders }: MediaGridProps) {
         <select
           value={folder}
           onChange={(e) => setFolder(e.target.value)}
-          className="rounded-lg border border-stone-300 px-3 py-2 text-sm outline-none focus:border-stone-500 focus:ring-2 focus:ring-stone-100 bg-white"
+          className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm outline-none focus:border-stone-500 focus:ring-2 focus:ring-stone-100 bg-white sm:w-auto"
         >
           <option value="all">所有資料夾</option>
           {folders.map((f) => (
@@ -276,7 +276,7 @@ export function MediaGrid({ items: initialItems, folders }: MediaGridProps) {
 
         {/* 批次操作 */}
         {selected.size > 0 && (
-          <div className="ml-auto flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
             <span className="text-sm text-stone-500">已選 {selected.size} 個</span>
             <button
               type="button"
@@ -290,9 +290,11 @@ export function MediaGrid({ items: initialItems, folders }: MediaGridProps) {
           </div>
         )}
 
-        <span className="ml-auto text-xs text-stone-400">
-          {filtered.length} 個檔案
-        </span>
+        {selected.size === 0 ? (
+          <span className="text-xs text-stone-400 sm:ml-auto">
+            {filtered.length} 個檔案
+          </span>
+        ) : null}
       </div>
 
       {/* 全選列 */}

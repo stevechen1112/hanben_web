@@ -61,7 +61,7 @@ function SortableItem({
         transition,
         opacity: isDragging ? 0.4 : 1,
       }}
-      className={`flex items-center gap-2 rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm ${isChild ? "ml-8" : ""}`}
+      className={`flex flex-col items-stretch gap-3 rounded-lg border border-stone-200 bg-white px-3 py-3 text-sm sm:flex-row sm:items-center sm:py-2 ${isChild ? "sm:ml-8" : ""}`}
     >
       <button
         type="button"
@@ -78,13 +78,13 @@ function SortableItem({
         value={item.title}
         onChange={(e) => onUpdate(item.id, "title", e.target.value)}
         placeholder="選單文字"
-        className="w-32 rounded border border-stone-200 px-2 py-1 text-xs outline-none focus:border-stone-400"
+        className="w-full rounded border border-stone-200 px-2 py-1.5 text-xs outline-none focus:border-stone-400 sm:w-32"
       />
       <input
         value={item.url}
         onChange={(e) => onUpdate(item.id, "url", e.target.value)}
         placeholder="/path 或 https://…"
-        className="flex-1 rounded border border-stone-200 px-2 py-1 text-xs font-mono outline-none focus:border-stone-400"
+        className="w-full rounded border border-stone-200 px-2 py-1.5 text-xs font-mono outline-none focus:border-stone-400 sm:flex-1"
       />
       <label className="flex items-center gap-1 text-xs text-stone-500 shrink-0">
         <input
@@ -171,8 +171,8 @@ export function NavMenuEditor({ location, label, initialItems }: NavMenuEditorPr
   }
 
   return (
-    <div className="rounded-xl border border-stone-200 bg-white p-5 space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 rounded-xl border border-stone-200 bg-white p-4 sm:p-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-sm font-semibold text-stone-700">{label}</h2>
         <button
           type="button"
@@ -229,7 +229,7 @@ export function NavMenuEditor({ location, label, initialItems }: NavMenuEditorPr
                   <button
                     type="button"
                     onClick={() => addItem(item.id)}
-                    className="ml-8 mt-1 flex items-center gap-1 text-xs text-stone-400 hover:text-stone-600 transition-colors"
+                    className="mt-1 flex items-center gap-1 text-xs text-stone-400 transition-colors hover:text-stone-600 sm:ml-8"
                   >
                     <Plus className="h-3 w-3" /> 加入子項目
                   </button>

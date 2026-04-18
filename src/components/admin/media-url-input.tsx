@@ -88,7 +88,7 @@ export function MediaUrlInput({
 
   return (
     <div className="space-y-2">
-      <div className="flex gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row">
         <input
           name={name}
           value={value}
@@ -107,7 +107,7 @@ export function MediaUrlInput({
       </div>
 
       {selectedItem ? (
-        <div className="flex items-center gap-3 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2">
+        <div className="flex items-start gap-3 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 sm:items-center">
           <div className="h-12 w-16 overflow-hidden rounded bg-white">
             <MediaPreview item={selectedItem} />
           </div>
@@ -119,9 +119,9 @@ export function MediaUrlInput({
       ) : null}
 
       {open ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 p-3 sm:p-4">
           <div className="flex h-[min(80vh,720px)] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-stone-100 px-5 py-4">
+            <div className="flex flex-col gap-3 border-b border-stone-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
               <div>
                 <h3 className="text-sm font-semibold text-stone-800">選擇媒體</h3>
                 <p className="text-xs text-stone-500">可直接選取已匯入媒體庫的正式素材</p>
@@ -154,7 +154,7 @@ export function MediaUrlInput({
                 <p className="text-sm text-stone-500">找不到符合條件的媒體。</p>
               ) : null}
 
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {items.map((item) => {
                   const isSelected = item.url === value;
 

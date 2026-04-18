@@ -86,7 +86,7 @@ export function ChannelForm({ action, defaultValues }: ChannelFormProps) {
         </div>
       </div>
 
-      <div className="flex items-center justify-end gap-3">
+      <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
         <button
           type="button"
           onClick={() => router.back()}

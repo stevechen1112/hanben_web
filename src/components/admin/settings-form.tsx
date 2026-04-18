@@ -39,7 +39,7 @@ export function SettingsForm({ groups, groupLabels }: SettingsFormProps) {
       )}
 
       {Object.entries(groups).map(([group, items]) => (
-        <div key={group} className="rounded-xl border border-stone-200 bg-white p-5">
+        <div key={group} className="rounded-xl border border-stone-200 bg-white p-4 sm:p-5">
           <h2 className="mb-4 text-sm font-semibold text-stone-700">
             {groupLabels[group] ?? group}
           </h2>
@@ -79,11 +79,11 @@ export function SettingsForm({ groups, groupLabels }: SettingsFormProps) {
         </div>
       ))}
 
-      <div className="flex justify-end">
+      <div className="flex justify-stretch sm:justify-end">
         <button
           type="submit"
           disabled={isPending}
-          className="flex items-center gap-2 rounded-xl bg-[#B72020] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#9e1c1c] disabled:opacity-60 transition-colors"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#B72020] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#9e1c1c] disabled:opacity-60 transition-colors sm:w-auto"
         >
           {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           {isPending ? "儲存中…" : "儲存所有設定"}

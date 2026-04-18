@@ -15,7 +15,7 @@ export default async function CollectionsPage() {
   return (
     <div className="space-y-6">
       {/* 標題列 */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-xl font-semibold text-stone-800">集合管理</h1>
           <p className="mt-0.5 text-sm text-stone-500">
@@ -24,7 +24,7 @@ export default async function CollectionsPage() {
         </div>
         <Link
           href="/admin/collections/new"
-          className="inline-flex items-center gap-1.5 rounded-lg bg-stone-800 px-4 py-2 text-sm font-medium text-white hover:bg-stone-700 transition-colors"
+          className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-stone-800 px-4 py-2 text-sm font-medium text-white hover:bg-stone-700 transition-colors"
         >
           <Plus className="h-4 w-4" />
           新增集合
@@ -46,67 +46,114 @@ export default async function CollectionsPage() {
         </div>
       ) : (
         <div className="rounded-xl border border-stone-200 bg-white overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-stone-100 bg-stone-50 text-left text-xs font-medium uppercase tracking-wide text-stone-500">
-                <th className="px-6 py-3">集合</th>
-                <th className="px-4 py-3 text-center">商品數</th>
-                <th className="px-4 py-3 text-center">排序</th>
-                <th className="px-4 py-3 text-center">狀態</th>
-                <th className="px-4 py-3" />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-stone-100">
-              {collections.map((c) => (
-                <tr key={c.id} className="hover:bg-stone-50 transition-colors">
-                  <td className="px-6 py-3.5">
-                    <div className="flex items-center gap-3">
-                      {c.imageUrl ? (
-                        <img
-                          src={c.imageUrl}
-                          alt={c.title}
-                          className="h-9 w-9 rounded-lg object-cover shrink-0"
-                        />
-                      ) : (
-                        <div className="h-9 w-9 rounded-lg bg-stone-100 flex items-center justify-center shrink-0">
-                          <FolderOpen className="h-4 w-4 text-stone-400" />
-                        </div>
-                      )}
-                      <div>
-                        <p className="font-medium text-stone-800">{c.title}</p>
-                        <p className="text-xs text-stone-400 font-mono">{c.slug}</p>
-                      </div>
+          <div className="divide-y divide-stone-100 lg:hidden">
+            {collections.map((c) => (
+              <Link
+                key={c.id}
+                href={`/admin/collections/${c.id}`}
+                className="block px-4 py-4 transition-colors hover:bg-stone-50"
+              >
+                <div className="flex items-start gap-3">
+                  {c.imageUrl ? (
+                    <img
+                      src={c.imageUrl}
+                      alt={c.title}
+                      className="h-12 w-12 shrink-0 rounded-lg object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-stone-100">
+                      <FolderOpen className="h-4 w-4 text-stone-400" />
                     </div>
-                  </td>
-                  <td className="px-4 py-3.5 text-center text-stone-600">
-                    {c._count.products}
-                  </td>
-                  <td className="px-4 py-3.5 text-center text-stone-500">
-                    {c.sortOrder}
-                  </td>
-                  <td className="px-4 py-3.5 text-center">
-                    <span
-                      className={`inline-flex rounded-full px-2 py-0.5 text-[0.7rem] font-medium ${
-                        c.isActive
-                          ? "bg-green-100 text-green-700"
-                          : "bg-stone-100 text-stone-500"
-                      }`}
-                    >
-                      {c.isActive ? "啟用" : "停用"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3.5 text-right">
-                    <Link
-                      href={`/admin/collections/${c.id}`}
-                      className="rounded-md border border-stone-200 px-3 py-1 text-xs text-stone-600 hover:bg-stone-50 transition-colors"
-                    >
-                      編輯
-                    </Link>
-                  </td>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium text-stone-800">{c.title}</p>
+                        <p className="mt-1 font-mono text-xs text-stone-400">{c.slug}</p>
+                      </div>
+                      <span
+                        className={`inline-flex shrink-0 rounded-full px-2 py-0.5 text-[0.7rem] font-medium ${
+                          c.isActive
+                            ? "bg-green-100 text-green-700"
+                            : "bg-stone-100 text-stone-500"
+                        }`}
+                      >
+                        {c.isActive ? "啟用" : "停用"}
+                      </span>
+                    </div>
+                    <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-stone-500">
+                      <span>{c._count.products} 件商品</span>
+                      <span>排序 {c.sortOrder}</span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          <div className="hidden overflow-x-auto lg:block">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-stone-100 bg-stone-50 text-left text-xs font-medium uppercase tracking-wide text-stone-500">
+                  <th className="px-6 py-3">集合</th>
+                  <th className="px-4 py-3 text-center">商品數</th>
+                  <th className="px-4 py-3 text-center">排序</th>
+                  <th className="px-4 py-3 text-center">狀態</th>
+                  <th className="px-4 py-3" />
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-stone-100">
+                {collections.map((c) => (
+                  <tr key={c.id} className="hover:bg-stone-50 transition-colors">
+                    <td className="px-6 py-3.5">
+                      <div className="flex items-center gap-3">
+                        {c.imageUrl ? (
+                          <img
+                            src={c.imageUrl}
+                            alt={c.title}
+                            className="h-9 w-9 rounded-lg object-cover shrink-0"
+                          />
+                        ) : (
+                          <div className="h-9 w-9 rounded-lg bg-stone-100 flex items-center justify-center shrink-0">
+                            <FolderOpen className="h-4 w-4 text-stone-400" />
+                          </div>
+                        )}
+                        <div>
+                          <p className="font-medium text-stone-800">{c.title}</p>
+                          <p className="text-xs text-stone-400 font-mono">{c.slug}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3.5 text-center text-stone-600">
+                      {c._count.products}
+                    </td>
+                    <td className="px-4 py-3.5 text-center text-stone-500">
+                      {c.sortOrder}
+                    </td>
+                    <td className="px-4 py-3.5 text-center">
+                      <span
+                        className={`inline-flex rounded-full px-2 py-0.5 text-[0.7rem] font-medium ${
+                          c.isActive
+                            ? "bg-green-100 text-green-700"
+                            : "bg-stone-100 text-stone-500"
+                        }`}
+                      >
+                        {c.isActive ? "啟用" : "停用"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3.5 text-right">
+                      <Link
+                        href={`/admin/collections/${c.id}`}
+                        className="rounded-md border border-stone-200 px-3 py-1 text-xs text-stone-600 hover:bg-stone-50 transition-colors"
+                      >
+                        編輯
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

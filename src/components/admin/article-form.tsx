@@ -102,7 +102,7 @@ export function ArticleForm({ mode, channels, action, defaultValues }: ArticleFo
               <label className="mb-1.5 block text-xs font-medium text-stone-600">
                 Slug <span className="text-red-500">*</span>
               </label>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                 <input
                   name="slug"
                   value={slug}

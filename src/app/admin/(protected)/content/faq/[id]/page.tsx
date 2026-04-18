@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { FaqForm } from "@/components/admin/faq-form";
 import { deleteFaq, updateFaq } from "@/lib/actions/faq";
+import { ConfirmSubmitButton } from "@/components/admin/confirm-submit-button";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -16,7 +17,7 @@ export default async function EditFaqPage({ params }: Props) {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-xl font-semibold text-stone-800">編輯問答</h1>
 
         <form
@@ -25,15 +26,11 @@ export default async function EditFaqPage({ params }: Props) {
             await deleteFaq(id);
           }}
         >
-          <button
-            type="submit"
-            className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors"
-            onClick={(e) => {
-              if (!confirm("確定要刪除這筆問答？")) e.preventDefault();
-            }}
-          >
-            刪除
-          </button>
+          <ConfirmSubmitButton
+            label="刪除"
+            confirmMessage="確定要刪除這筆問答？"
+            className="w-full sm:w-auto"
+          />
         </form>
       </div>
 

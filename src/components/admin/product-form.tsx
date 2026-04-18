@@ -155,7 +155,7 @@ export function ProductForm({
                 <label className="mb-1.5 block text-xs font-medium text-stone-600">
                   Slug (URL 路徑) <span className="text-red-500">*</span>
                 </label>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                   <input
                     name="slug"
                     value={slug}
@@ -219,7 +219,7 @@ export function ProductForm({
 
           {/* 規格管理 */}
           <div className="rounded-xl border border-stone-200 bg-white p-5">
-            <div className="mb-4 flex items-center justify-between">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <h2 className="text-sm font-semibold text-stone-700">規格</h2>
               <button
                 type="button"
@@ -237,8 +237,8 @@ export function ProductForm({
                   key={idx}
                   className="rounded-lg border border-stone-100 bg-stone-50/50 p-3.5"
                 >
-                  <div className="mb-3 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+                  <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center justify-between gap-2 sm:justify-start">
                       <GripVertical className="h-4 w-4 text-stone-300" />
                       <span className="text-xs font-medium text-stone-600">
                         規格 {idx + 1}
@@ -266,8 +266,8 @@ export function ProductForm({
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
-                    <div className="col-span-2 sm:col-span-1">
+                  <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 xl:grid-cols-5">
+                    <div className="sm:col-span-2 xl:col-span-1">
                       <label className="mb-1 block text-[0.7rem] text-stone-500">
                         規格名稱 *
                       </label>

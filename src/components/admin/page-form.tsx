@@ -94,7 +94,7 @@ export function PageForm({ mode, action, defaultValues }: PageFormProps) {
               <label className="mb-1.5 block text-xs font-medium text-stone-600">
                 Slug <span className="text-red-500">*</span>
               </label>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                 <input name="slug" value={slug} onChange={(e) => { setSlug(e.target.value); setSlugManual(true); }}
                   required pattern="[a-z0-9-]+"
                   className="flex-1 rounded-lg border border-stone-200 px-3.5 py-2.5 font-mono text-sm focus:border-[#B72020] focus:outline-none focus:ring-2 focus:ring-[#B72020]/20" />

@@ -24,8 +24,8 @@ export default async function EditPagePage({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm text-stone-500">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-wrap items-center gap-2 text-sm text-stone-500">
           <Link href="/admin/pages" className="flex items-center gap-1.5 hover:text-stone-700 transition-colors">
             <ArrowLeft className="h-3.5 w-3.5" />
             頁面列表
@@ -36,7 +36,7 @@ export default async function EditPagePage({
             {page.isPublished ? "已發布" : "草稿"}
           </span>
         </div>
-        <form action={deletePage.bind(null, id) as unknown as (formData: FormData) => void}>
+        <form action={deletePage.bind(null, id) as unknown as (formData: FormData) => void} className="w-full sm:w-auto">
           <DeletePageButton />
         </form>
       </div>

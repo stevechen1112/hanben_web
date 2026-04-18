@@ -70,7 +70,7 @@ function SortableProductRow({
         transition,
         opacity: isDragging ? 0.5 : 1,
       }}
-      className="flex items-center gap-3 rounded-lg border border-stone-200 bg-white p-2.5 text-sm"
+      className="flex flex-col items-stretch gap-2 rounded-lg border border-stone-200 bg-white p-3 text-sm sm:flex-row sm:items-center sm:gap-3 sm:p-2.5"
     >
       <button
         type="button"
@@ -275,7 +275,7 @@ export function CollectionForm({
       <div className="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
         <h2 className="text-sm font-semibold text-stone-700">顯示設定</h2>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <input
             type="hidden" name="isActive" value="false" />
           <input
@@ -298,7 +298,7 @@ export function CollectionForm({
             name="sortOrder"
             defaultValue={defaultValues?.sortOrder ?? 0}
             min={0}
-            className="w-28 rounded-lg border border-stone-300 px-3 py-2 text-sm outline-none focus:border-stone-500 focus:ring-2 focus:ring-stone-100"
+            className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm outline-none focus:border-stone-500 focus:ring-2 focus:ring-stone-100 sm:w-28"
           />
         </div>
       </div>
@@ -400,7 +400,7 @@ export function CollectionForm({
       </div>
 
       {/* 提交 */}
-      <div className="flex items-center justify-end gap-3">
+      <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
         <button
           type="button"
           onClick={() => router.back()}
