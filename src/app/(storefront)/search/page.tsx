@@ -1,5 +1,8 @@
 import Link from "next/link";
+import { ProductListTracker } from "@/components/storefront/tracking/product-list-tracker";
+import { SearchResultsTracker } from "@/components/storefront/tracking/search-results-tracker";
 import { db } from "@/lib/db";
+import { getTrackingNamingSettings } from "@/lib/site-settings";
 
 function formatCurrency(value: number | null) {
   if (value == null) return "即將上架";
@@ -17,6 +20,7 @@ export default async function SearchPage({
 }) {
   const { q = "" } = await searchParams;
   const keyword = q.trim();
+  const trackingNaming = await getTrackingNamingSettings();
 
   const [products, articles] = keyword
     ? await Promise.all([
@@ -74,6 +78,28 @@ export default async function SearchPage({
 
   return (
     <div className="storefront-page">
+      {keyword ? (
+        <SearchResultsTracker
+          articleCount={articles.length}
+          productCount={sortedProducts.length}
+          searchTerm={keyword}
+        />
+      ) : null}
+      {keyword && sortedProducts.length > 0 ? (
+        <ProductListTracker
+          items={sortedProducts.map((product) => ({
+            id: product.id,
+            price: product.variants[0] ? Number(product.variants[0].price) : null,
+            sku: product.variants[0]?.sku ?? null,
+            title: product.title,
+            variantId: product.variants[0]?.id ?? null,
+            variantTitle: product.variants[0]?.title ?? null,
+          }))}
+          listId={`${trackingNaming.searchListIdPrefix}${keyword}`}
+          listName={`${trackingNaming.searchListNamePrefix}${keyword}`}
+          pageType="searchresults"
+        />
+      ) : null}
       <div className="mb-10 border-b border-[#ece7de] pb-6 text-center">
         <h1 className="text-[2.2rem] font-semibold tracking-[0.08em] text-[#3f3a37] sm:text-[2.6rem]">搜尋商品與內容</h1>
       </div>

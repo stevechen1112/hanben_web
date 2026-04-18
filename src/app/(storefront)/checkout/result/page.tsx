@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PurchaseEventTracker } from "@/components/storefront/tracking/purchase-event-tracker";
 import { db } from "@/lib/db";
 import { readOrderPaymentInfo } from "@/lib/order-payment-info";
 
@@ -64,6 +65,26 @@ export default async function CheckoutResultPage({
 
   return (
     <div className="storefront-page-narrow max-w-5xl">
+      <PurchaseEventTracker
+        order={{
+          city: order.shippingCity,
+          country: "TW",
+          email: order.email,
+          id: order.id,
+          orderNumber: order.orderNumber,
+          paymentStatus: order.paymentStatus,
+          phone: order.phone,
+          total: Number(order.total),
+          items: order.items.map((item) => ({
+            variantId: item.variantId,
+            productTitle: item.productTitle,
+            variantTitle: item.variantTitle,
+            quantity: item.quantity,
+            unitPrice: Number(item.unitPrice),
+            sku: item.sku,
+          })),
+        }}
+      />
       <div className="border border-[#dcc28a]/35 bg-white p-8 sm:p-10">
         <p className="storefront-eyebrow">ORDER RESULT</p>
         <h1 className="mt-4 storefront-heading">訂單已建立</h1>

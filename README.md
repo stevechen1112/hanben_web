@@ -97,6 +97,14 @@ copy .env.example .env
 - `UPLOADTHING_*`
 - `RESEND_*`
 
+若要啟用廣告成效回傳與 server-side purchase tracking，另可選填：
+
+- `META_CONVERSIONS_API_ACCESS_TOKEN`
+- `META_CONVERSIONS_API_TEST_EVENT_CODE`
+- `META_GRAPH_API_VERSION`（預設 `v22.0`）
+
+這些值在正式使用時建議優先填在後台 `網站設定 > 追蹤 / 廣告`；`.env` 僅作 fallback 或部署初期暫代。
+
 ### 3. 初始化資料庫
 
 若是新環境，建議至少執行：
@@ -199,6 +207,42 @@ npm run start
 - Resend：模板與發信流程已在 repo 內，正式寄送需要驗證網域
 - UploadThing：後台媒體上傳依賴 `UPLOADTHING_SECRET` 與 `UPLOADTHING_APP_ID`
 - Sentry：目前 env 欄位已保留，但 repo 尚未完成完整 SDK 接線
+
+## Tracking / GTM
+
+如果你想把這套做法複用到下一個網站，先讀 [TRACKING_PLAYBOOK.md](./TRACKING_PLAYBOOK.md)。這份文件整理了平台埋設、網站體質調整、後台設計、事件契約、驗證流程，以及 hanben-admin 這次的實作地圖。
+
+如果你要實際在 GTM 容器裡接事件、建 Tag / Trigger / Variable，直接看 [GTM_IMPLEMENTATION_GUIDE.md](./GTM_IMPLEMENTATION_GUIDE.md)。
+
+目前 storefront 已內建一層可直接上線的追蹤基礎設施：
+
+- 就算你目前還沒有 GTM、GA4、Google Ads、Meta Pixel、Meta CAPI 等外部資訊，也可以先留白；網站不會因此壞掉，只是對應的第三方追蹤不會啟用
+- 後台 `網站設定 > 追蹤 / 廣告` 會顯示目前各整合的整備狀態，方便之後逐項補齊
+
+- 後台 `網站設定 > 追蹤 / 廣告` 可設定 `Facebook Pixel ID`、`Google Analytics ID`、`Google Tag Manager 容器 ID`、`Google Ads ID`、`Google Ads Conversion Label`、Meta CAPI Access Token 等整合參數
+- 後台 `網站設定 > 追蹤 / 廣告` 也可設定 `Google Search Console 驗證碼`，網站會自動輸出驗證 meta tag
+- 前台 root layout 會自動注入 Google Consent Mode 預設狀態，並顯示 Cookie 偏好橫幅
+- 商品頁會送出 `view_item`
+- 加入購物車會送出 `add_to_cart`
+- 結帳頁會送出 `begin_checkout`
+- 訂單已付款時，結果頁會送出 client-side `purchase`
+- 若已填 `Google Ads ID` 與 `Google Ads Conversion Label`，已付款結果頁也會送出 Google Ads `purchase conversion`
+- Google Ads enhanced conversions 目前會在 purchase conversion 同步附帶 email / phone 的 user-provided data
+- Google Ads remarketing / 動態再行銷資料層目前已涵蓋商品頁、購物車、結帳、購買完成等關鍵節點
+- 商品清單頁也已補上 `view_item_list` 與 list-level remarketing：目前涵蓋分類商品頁與搜尋結果商品清單
+- 首頁商品模組也會送出 `view_item_list`，搜尋頁則額外送出 `view_search_results`
+- 後台 `網站設定 > 追蹤 / 廣告` 也已納入這些規則：可直接管理首頁商品清單 List ID、分類頁 List ID 前綴、搜尋頁 List ID / List Name 前綴
+- ECPay 付款 webhook 在訂單首次轉為 `PAID` 時，會嘗試透過 Meta Conversions API 回傳 server-side `Purchase`
+
+補充規則：
+
+- 若設定了 `Google Tag Manager 容器 ID`，Google 端以 GTM 為主，不再直接載入 `gtag.js`
+- 若有 GTM，網站會額外推送 `google_ads_purchase` dataLayer event 與 `user_data`，方便後續直接在 GTM 內接 Google Ads conversion / enhanced conversions
+- 若有 GTM，網站也會推送 `google_ads_remarketing` dataLayer event，內含 `ecomm_pagetype`、`ecomm_prodid`、`ecomm_totalvalue` 與 `retail` 商品資料，方便接動態再行銷
+- 若沒有 GTM，但已填 `Google Ads ID` 與 `Conversion Label`，網站會直接用 Google tag 送出 conversion
+- Meta Pixel 仍可直接由站台載入；若你也在 GTM 內配置 Meta Pixel，請避免雙重送出
+- Meta Conversions API 會使用付款成功 webhook 與相同 `event_id`（`order-{orderId}-paid`）做 browser / server deduplication
+- Meta CAPI 會優先讀後台設定頁的值；若後台留空，才 fallback 到 `.env`
 
 ## 部署
 

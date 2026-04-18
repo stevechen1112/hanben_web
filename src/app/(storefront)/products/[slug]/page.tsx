@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { ProductGallery } from "@/components/storefront/product-gallery";
 import { ProductPurchaseForm } from "@/components/storefront/product-purchase-form";
+import { ProductViewTracker } from "@/components/storefront/tracking/product-view-tracker";
 import { getProductBySlug } from "@/lib/storefront";
 
 function formatCurrency(value: number | null) {
@@ -22,6 +23,16 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
 
   return (
     <>
+      <ProductViewTracker
+        product={{
+          id: product.id,
+          title: product.title,
+          variantId: primaryVariant?.id ?? product.id,
+          variantTitle: primaryVariant?.title,
+          price: primaryPrice ?? 0,
+          sku: primaryVariant?.sku ?? null,
+        }}
+      />
       <div className="sticky top-[72px] z-30 hidden border-y border-[#ece7de] bg-white/95 backdrop-blur lg:block">
         <div className="mx-auto flex max-w-[1360px] items-center justify-between gap-6 px-4 py-3 sm:px-6 lg:px-8">
           <div className="flex min-w-0 items-center gap-4">

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Play } from "lucide-react";
+import { ProductListTracker } from "@/components/storefront/tracking/product-list-tracker";
 import type { HeroSlide, HomepageSection } from "@/generated/prisma/client";
 import { useCartStore } from "@/lib/cart-store";
 import { getManagedLegacyOfficialUrl } from "@/lib/legacy-official-media";
@@ -111,8 +112,8 @@ const defaultBenefits: BenefitItem[] = [
 const defaultAssurance: AssuranceContent = {
   heading: "漢本三代將「安心」設為第一原則",
   bodyLines: [
-    "漢本三代開發的舒活飲適合長期補充、長期保養。",
-    "我們提供細水長流的穩定支持，因此把關更嚴格，為身體多留一份餘裕。",
+    "漢本三代開發的舒活飲適合<strong>長期補充、長期保養</strong>。",
+    "我們提供<strong>細水長流的穩定支持</strong>，因此<strong>把關更嚴格</strong>，為身體多留一份餘裕。",
     "從安全標準起跑，讓真正該被重視的檢驗到位。",
   ],
   note: "讓日常保養，多一點安心。嚴格檢驗通過，是對健康最基本的尊重。",
@@ -191,6 +192,22 @@ function asRecord(value: unknown): Record<string, unknown> {
 
 function asStringArray(value: unknown, fallback: string[] = []) {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string" && item.length > 0) : fallback;
+}
+
+const assuranceBoldPhrases = ["長期補充、長期保養", "細水長流的穩定支持", "把關更嚴格"];
+
+function formatAssuranceBodyLine(line: string) {
+  if (line.includes("<strong>")) {
+    return line;
+  }
+
+  let formattedLine = line;
+
+  for (const phrase of assuranceBoldPhrases) {
+    formattedLine = formattedLine.replaceAll(phrase, `<strong>${phrase}</strong>`);
+  }
+
+  return formattedLine;
 }
 
 function asObjectArray<T>(value: unknown, fallback: T[] = []) {
@@ -419,6 +436,8 @@ function ProductCardView({ product }: { product: ProductCard }) {
     try {
       await addItem(product.variantId, 1);
       router.refresh();
+    } catch {
+      // Global cart feedback handles the error state.
     } finally {
       setIsPending(false);
     }
@@ -466,12 +485,38 @@ function ProductCardView({ product }: { product: ProductCard }) {
   );
 }
 
-function ProductShowcaseSection({ title, products }: { title?: string | null; products: ProductCard[] }) {
+function ProductShowcaseSection({
+  title,
+  products,
+  trackingListId,
+  trackingListName,
+}: {
+  title?: string | null;
+  products: ProductCard[];
+  trackingListId: string;
+  trackingListName?: string;
+}) {
+  const resolvedTitle = title ?? "漢本三代舒活飲系列";
+  const resolvedTrackingListName = trackingListName?.trim() || resolvedTitle;
+
   return (
     <section className="bg-white">
       <div className="storefront-page py-12 lg:py-14">
+        <ProductListTracker
+          items={products.map((product) => ({
+            id: product.id,
+            price: product.price,
+            sku: product.sku,
+            title: product.title,
+            variantId: product.variantId,
+            variantTitle: product.variantTitle,
+          }))}
+          listId={trackingListId}
+          listName={resolvedTrackingListName}
+          pageType="home"
+        />
         <div className="text-center">
-          <h2 className="text-[1.6rem] font-medium tracking-[0.02em] text-[#231d19] lg:text-[1.85rem]">{title ?? "漢本三代舒活飲系列"}</h2>
+          <h2 className="text-[1.6rem] font-medium tracking-[0.02em] text-[#231d19] lg:text-[1.85rem]">{resolvedTitle}</h2>
         </div>
 
         <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 lg:grid-cols-3 lg:gap-x-2 lg:gap-y-10">
@@ -493,7 +538,7 @@ function BrandCommitmentSection({ content }: { content: BrandCommitmentContent }
   const bodyLines = content.bodyLines && content.bodyLines.length > 0 ? content.bodyLines : defaultBrandCommitment.bodyLines ?? [];
 
   return (
-    <section className="bg-white text-[#231d19]">
+    <section className="bg-[#992928] text-white">
       <div className="storefront-page py-14 text-left lg:py-16">
         <div className="max-w-[980px] space-y-3">
           <div className="space-y-0.5">
@@ -503,7 +548,7 @@ function BrandCommitmentSection({ content }: { content: BrandCommitmentContent }
               </h2>
             ))}
           </div>
-          <div className="space-y-2 text-[1rem] leading-[1.8] text-[#4f463f] lg:text-[1rem]">
+          <div className="space-y-2 text-[1rem] leading-[1.8] text-white/90 lg:text-[1rem]">
             {bodyLines.map((line, index) => (
               <p key={`${line}-${index}`}>{line}</p>
             ))}
@@ -568,7 +613,7 @@ function AssuranceSection({ content }: { content: AssuranceContent }) {
             <h2 className="text-[1.9rem] font-semibold leading-[1.38] text-[#a1281e]">{content.heading || defaultAssurance.heading}</h2>
             <div className="space-y-3 text-[0.98rem] leading-8 text-[#5b544d]">
               {(content.bodyLines && content.bodyLines.length > 0 ? content.bodyLines : defaultAssurance.bodyLines ?? []).map((line, index) => (
-                <p key={`${line}-${index}`}>{line}</p>
+                <p key={index} dangerouslySetInnerHTML={{ __html: formatAssuranceBodyLine(line) }} />
               ))}
             </div>
             <p className="text-[0.98rem] leading-8 text-[#4a433d]">{content.note || defaultAssurance.note}</p>
@@ -663,7 +708,19 @@ function getSectionContent(sections: HomepageSection[], type: string) {
   return asRecord(sections.find((section) => section.sectionType === type)?.content);
 }
 
-export function Homepage({ slides, sections, featuredProducts }: { slides: HeroSlide[]; sections: HomepageSection[]; featuredProducts: ProductCard[] }) {
+export function Homepage({
+  slides,
+  sections,
+  featuredProducts,
+  featuredProductsTrackingListId,
+  featuredProductsTrackingListName,
+}: {
+  slides: HeroSlide[];
+  sections: HomepageSection[];
+  featuredProducts: ProductCard[];
+  featuredProductsTrackingListId: string;
+  featuredProductsTrackingListName?: string;
+}) {
   const heroContent = getSectionContent(sections, "hero_slider");
   const storyContent = getSectionContent(sections, "brand_story") as StoryContent;
   const statsContent = getSectionContent(sections, "stats_section");
@@ -687,7 +744,12 @@ export function Homepage({ slides, sections, featuredProducts }: { slides: HeroS
       <HeroSection slides={slides} content={heroContent} />
       <StorySection content={storyContent} />
       <StatsSection stats={stats} />
-      <ProductShowcaseSection title={(productContent.heading as string) || "漢本三代舒活飲系列"} products={homepageFeaturedProducts} />
+      <ProductShowcaseSection
+        title={(productContent.heading as string) || "漢本三代舒活飲系列"}
+        products={homepageFeaturedProducts}
+        trackingListId={featuredProductsTrackingListId}
+        trackingListName={featuredProductsTrackingListName}
+      />
       <BrandCommitmentSection content={{ headingLines: asStringArray(brandCommitmentContent.headingLines, defaultBrandCommitment.headingLines), bodyLines: asStringArray(brandCommitmentContent.bodyLines, defaultBrandCommitment.bodyLines) }} />
       <FeatureMediaSection content={featureMediaContent} />
       <BenefitsSection items={benefitItems} />

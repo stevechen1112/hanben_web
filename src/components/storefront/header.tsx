@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Menu, Search, ShoppingBag, User, X } from "lucide-react";
+import { Menu, ShoppingCart, User, X } from "lucide-react";
 import { getManagedLegacyOfficialUrl } from "@/lib/legacy-official-media";
 import type { StorefrontNavItem } from "@/lib/storefront";
+import { useCartStore } from "@/lib/cart-store";
 
 const HEADER_LOGO_URL = getManagedLegacyOfficialUrl("/official/shared/header-logo.png");
 
@@ -50,6 +51,8 @@ export function StorefrontHeader({
   const primaryItems = items.slice(0, 8);
   const overflowItems = items.slice(8);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const cartQty = useCartStore((state) => state.cart.totalQuantity);
+  const cartIconClass = cartQty > 0 ? "h-5 w-5 cart-has-items" : "h-5 w-5";
 
   useEffect(() => {
     document.body.classList.toggle("overflow-hidden", drawerOpen);
@@ -61,7 +64,7 @@ export function StorefrontHeader({
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-[#d8b66d] bg-[#b72020] text-white shadow-[0_1px_0_rgba(0,0,0,0.04)]">
+      <header className="border-b border-[#d8b66d] bg-[#b72020] text-white shadow-[0_1px_0_rgba(0,0,0,0.04)]">
         <div className="mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-8">
           <div className="hidden h-[66px] items-center justify-between gap-8 lg:flex">
             <Link href="/" aria-label={siteName} className="flex min-w-0 items-center gap-3">
@@ -92,15 +95,17 @@ export function StorefrontHeader({
               </nav>
 
               <div className="flex items-center gap-1">
-                <HeaderActionLink href="/search" label="搜尋">
-                  <Search className="h-4 w-4" />
-                </HeaderActionLink>
                 <HeaderActionLink href="/account" label="會員中心">
                   <User className="h-4 w-4" />
                 </HeaderActionLink>
-                <HeaderActionLink href="/cart" label="購物車">
-                  <ShoppingBag className="h-4 w-4" />
-                </HeaderActionLink>
+                <Link href="/cart" className="relative flex h-10 w-10 items-center justify-center text-white transition hover:text-[#f2d789]" aria-label="購物車">
+                  <ShoppingCart className={cartIconClass} />
+                  {cartQty > 0 && (
+                    <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#f2dc8d] px-[3px] text-[10px] font-bold leading-none text-[#7a1414]">
+                      {cartQty > 99 ? "99+" : cartQty}
+                    </span>
+                  )}
+                </Link>
               </div>
             </div>
           </div>
@@ -115,12 +120,14 @@ export function StorefrontHeader({
             </Link>
 
             <div className="flex items-center justify-end gap-0.5">
-              <HeaderActionLink href="/search" label="搜尋">
-                <Search className="h-4 w-4" />
-              </HeaderActionLink>
-              <HeaderActionLink href="/cart" label="購物車">
-                <ShoppingBag className="h-4 w-4" />
-              </HeaderActionLink>
+              <Link href="/cart" className="relative flex h-10 w-10 items-center justify-center text-white transition hover:text-[#f2d789]" aria-label="購物車">
+                <ShoppingCart className={cartIconClass} />
+                {cartQty > 0 && (
+                  <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#f2dc8d] px-[3px] text-[10px] font-bold leading-none text-[#7a1414]">
+                    {cartQty > 99 ? "99+" : cartQty}
+                  </span>
+                )}
+              </Link>
             </div>
           </div>
         </div>
@@ -150,14 +157,16 @@ export function StorefrontHeader({
 
           <div className="border-t border-[#efe8d7] px-5 py-5">
             <div className="flex items-center gap-3 text-stone-700">
-              <Link href="/search" onClick={() => setDrawerOpen(false)} className="flex h-10 w-10 items-center justify-center rounded-full border border-[#e7dfd2]" aria-label="搜尋">
-                <Search className="h-4 w-4" />
-              </Link>
               <Link href="/account" onClick={() => setDrawerOpen(false)} className="flex h-10 w-10 items-center justify-center rounded-full border border-[#e7dfd2]" aria-label="會員中心">
                 <User className="h-4 w-4" />
               </Link>
-              <Link href="/cart" onClick={() => setDrawerOpen(false)} className="flex h-10 w-10 items-center justify-center rounded-full border border-[#e7dfd2]" aria-label="購物車">
-                <ShoppingBag className="h-4 w-4" />
+              <Link href="/cart" onClick={() => setDrawerOpen(false)} className="relative flex h-10 w-10 items-center justify-center rounded-full border border-[#e7dfd2]" aria-label="購物車">
+                <ShoppingCart className={cartIconClass} />
+                {cartQty > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#b72020] px-[3px] text-[10px] font-bold leading-none text-white">
+                    {cartQty > 99 ? "99+" : cartQty}
+                  </span>
+                )}
               </Link>
             </div>
           </div>

@@ -8,16 +8,29 @@ type ActionResult = { success: true } | { error: string };
 
 // ── 批次更新一組 SiteSetting keys ─────────────────────────
 export async function updateSiteSettings(
-  updates: { key: string; value: string }[],
+  updates: {
+    key: string;
+    value: string;
+    group?: string;
+    label?: string;
+    type?: string;
+  }[],
 ): Promise<ActionResult> {
   const session = await auth();
   if (!session?.user) return { error: "未授權" };
 
   await db.$transaction(
-    updates.map(({ key, value }) =>
-      db.siteSetting.updateMany({
+    updates.map(({ key, value, group, label, type }) =>
+      db.siteSetting.upsert({
         where: { key },
-        data: { value },
+        update: { value },
+        create: {
+          key,
+          value,
+          type: type || "text",
+          group: group || "general",
+          label: label || key,
+        },
       }),
     ),
   );

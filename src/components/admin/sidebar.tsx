@@ -67,6 +67,7 @@ const navItems: NavItem[] = [
     icon: Settings,
     children: [
       { title: "一般設定", href: "/admin/site-settings/general" },
+      { title: "追蹤 / 廣告", href: "/admin/site-settings/tracking" },
       { title: "導覽選單", href: "/admin/site-settings/navigation" },
       { title: "首頁區塊", href: "/admin/site-settings/homepage" },
       { title: "公告列", href: "/admin/site-settings/announcement" },

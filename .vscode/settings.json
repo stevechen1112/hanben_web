@@ -1,0 +1,36 @@
+{
+  "files.exclude": {
+    "**/.git": true,
+    "**/.next": true,
+    "**/node_modules": true,
+    "**/.venv": true,
+    "官網": true,
+    "三代官方網站_SHOPIFY": true
+  },
+  "search.exclude": {
+    "**/.git": true,
+    "**/.next": true,
+    "**/node_modules": true,
+    "**/.venv": true,
+    "官網": true,
+    "三代官方網站_SHOPIFY": true,
+    "reference": true,
+    "public/media-library/provided": true
+  },
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/.next/**": true,
+    "**/node_modules/**": true,
+    "**/.venv/**": true,
+    "官網/**": true,
+    "三代官方網站_SHOPIFY/**": true,
+    "reference/**": true,
+    "public/media-library/provided/**": true
+  },
+  "typescript.tsserver.watchOptions": {
+    "watchFile": "useFsEventsOnParentDirectory",
+    "watchDirectory": "useFsEvents",
+    "fallbackPolling": "dynamicPriority"
+  }
+}

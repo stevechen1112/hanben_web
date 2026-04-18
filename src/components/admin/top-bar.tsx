@@ -24,6 +24,7 @@ const routeTitles: Record<string, string> = {
   "/admin/media": "媒體庫",
   "/admin/contact": "聯絡表單",
   "/admin/site-settings/general": "一般設定",
+  "/admin/site-settings/tracking": "追蹤 / 廣告",
   "/admin/site-settings/navigation": "導覽選單",
   "/admin/site-settings/homepage": "首頁區塊",
   "/admin/site-settings/announcement": "公告列",

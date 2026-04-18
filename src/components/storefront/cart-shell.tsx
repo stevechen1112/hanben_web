@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
+import { createAnalyticsItem, trackViewCart } from "@/lib/analytics";
 import { useCartStore } from "@/lib/cart-store";
 
 function formatCurrency(value: number) {
@@ -23,6 +24,26 @@ export function CartShell() {
   useEffect(() => {
     void initialize();
   }, [initialize]);
+
+  useEffect(() => {
+    if (!cart || cart.items.length === 0) {
+      return;
+    }
+
+    trackViewCart({
+      value: cart.subtotal,
+      items: cart.items.map((item) =>
+        createAnalyticsItem({
+          itemId: item.variantId,
+          itemName: item.productTitle,
+          itemVariant: item.variantTitle,
+          price: item.price,
+          quantity: item.quantity,
+          sku: item.sku,
+        }),
+      ),
+    });
+  }, [cart]);
 
   return (
     <div className="storefront-page">
@@ -103,8 +124,8 @@ export function CartShell() {
             <h2 className="mt-3 text-3xl font-semibold text-[#3f3a37]">訂單摘要</h2>
             <div className="mt-8 space-y-4 text-sm text-stone-600">
               <div className="flex items-center justify-between">
-                <span>商品數量</span>
-                <span className="font-semibold text-[#671515]">{cart.itemCount} 件</span>
+                <span>總件數</span>
+                <span className="font-semibold text-[#671515]">{cart.totalQuantity} 件</span>
               </div>
               <div className="flex items-center justify-between border-b border-[#eadab5] pb-4">
                 <span>商品小計</span>

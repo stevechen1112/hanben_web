@@ -54,7 +54,8 @@ export default async function GeneralSettingsPage() {
       />
 
       <SettingsGroup
-        title="社群 / 追蹤碼"
+        title="社群連結"
+        description="追蹤碼與廣告平台憑證已移到「追蹤 / 廣告」頁獨立管理，這裡只保留對外社群入口。"
         fields={[
           {
             key: "facebook_url",
@@ -76,18 +77,6 @@ export default async function GeneralSettingsPage() {
             value: val("line_url"),
             type: "url",
             placeholder: "https://line.me/R/ti/p/…",
-          },
-          {
-            key: "facebook_pixel_id",
-            label: "Facebook Pixel ID",
-            value: val("facebook_pixel_id"),
-            placeholder: "863478774420303",
-          },
-          {
-            key: "ga_id",
-            label: "Google Analytics 追蹤 ID",
-            value: val("ga_id"),
-            placeholder: "GT-XXXXXXXXX",
           },
         ]}
       />

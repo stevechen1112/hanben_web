@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { getEcpayHashConfig } from "@/lib/ecpay";
 import { verifyCheckMacValue } from "@/lib/ecpay-common";
 import { getOrderEmailPayload, sendPaymentReceived } from "@/lib/email";
+import { sendMetaPurchaseEvent } from "@/lib/meta-conversions";
 import { upsertOrderPaymentInfo } from "@/lib/order-payment-info";
 
 function parsePaymentDate(raw: string | undefined) {
@@ -77,6 +78,12 @@ export async function POST(request: Request) {
   }
 
   if (shouldSendPaymentEmail) {
+    try {
+      await sendMetaPurchaseEvent(order.id);
+    } catch (error) {
+      console.error("Failed to send Meta purchase event", error);
+    }
+
     try {
       const emailOrder = await getOrderEmailPayload(order.id);
       if (emailOrder) {

@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { createAnalyticsItem, trackInitiateCheckout } from "@/lib/analytics";
 import type { ShippingOption } from "@/lib/shipping";
 import { computeCheckoutSummary, paymentMethodOptions } from "@/lib/checkout";
 import { useCartStore } from "@/lib/cart-store";
@@ -56,6 +57,7 @@ export function CheckoutForm({
   const clearCart = useCartStore((state) => state.clearCart);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const checkoutTrackedRef = useRef<string | null>(null);
   const [form, setForm] = useState<CheckoutFormState>({
     email: defaults.email,
     phone: defaults.phone,
@@ -85,6 +87,32 @@ export function CheckoutForm({
 
   const summary = computeCheckoutSummary(cart ?? { items: [], itemCount: 0, subtotal: 0 }, selectedShipping);
   const isHomeDelivery = form.shippingMethod.startsWith("home_");
+
+  useEffect(() => {
+    if (!cart || cart.items.length === 0) {
+      return;
+    }
+
+    const signature = [cart.updatedAt, form.shippingMethod, summary.total].join(":");
+    if (checkoutTrackedRef.current === signature) {
+      return;
+    }
+
+    checkoutTrackedRef.current = signature;
+    trackInitiateCheckout({
+      value: summary.total,
+      items: cart.items.map((item) =>
+        createAnalyticsItem({
+          itemId: item.variantId,
+          itemName: item.productTitle,
+          itemVariant: item.variantTitle,
+          price: item.price,
+          quantity: item.quantity,
+          sku: item.sku,
+        }),
+      ),
+    });
+  }, [cart, form.shippingMethod, summary.total]);
 
   function updateField<Key extends keyof typeof form>(key: Key, value: (typeof form)[Key]) {
     setForm((current) => ({ ...current, [key]: value }));

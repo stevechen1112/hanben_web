@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { AnnouncementBar } from "@/components/storefront/announcement-bar";
+import { StorefrontCartFeedback } from "@/components/storefront/cart-feedback";
 import { StorefrontFooter } from "@/components/storefront/footer";
 import { StorefrontHeader } from "@/components/storefront/header";
 import { StorefrontSupportWidget } from "@/components/storefront/support-widget";
@@ -13,7 +14,7 @@ export default async function StorefrontLayout({ children }: { children: ReactNo
       <div data-storefront-announcement>
         <AnnouncementBar announcement={chrome.announcement} />
       </div>
-      <div data-storefront-header>
+      <div data-storefront-header className="sticky top-0 z-40">
         <StorefrontHeader siteName={chrome.settings.siteName} siteTagline={chrome.settings.siteTagline} logoUrl={chrome.settings.siteLogoUrl} items={chrome.headerItems} />
       </div>
       <main data-storefront-main className="flex-1">{children}</main>
@@ -28,6 +29,7 @@ export default async function StorefrontLayout({ children }: { children: ReactNo
           items={chrome.footerItems}
         />
       </div>
+      <StorefrontCartFeedback />
       <StorefrontSupportWidget primaryUrl={chrome.settings.lineUrl || chrome.settings.facebookUrl || undefined} />
     </div>
   );

@@ -143,6 +143,20 @@
   }
 }
 
+/* Cart nudge: short wiggle burst every ~5 s when cart has items */
+@keyframes cart-nudge {
+  0%,  8%, 100% { transform: rotate(0deg) scale(1);   }
+  1%            { transform: rotate(-18deg) scale(1.15); }
+  3%            { transform: rotate(16deg) scale(1.15);  }
+  5%            { transform: rotate(-12deg) scale(1.1);  }
+  7%            { transform: rotate(8deg) scale(1.05);   }
+}
+
+.cart-has-items {
+  animation: cart-nudge 5s ease-in-out infinite;
+  transform-origin: top center;
+}
+
 @layer components {
   .storefront-page {
     margin-inline: auto;

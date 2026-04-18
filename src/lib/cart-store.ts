@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { createAnalyticsItem, trackAddToCart } from "@/lib/analytics";
 import { createEmptyCartSnapshot, type CartSnapshot } from "@/lib/cart";
 
 type CartStoreState = {
@@ -10,6 +11,8 @@ type CartStoreState = {
   initialized: boolean;
   loading: boolean;
   error: string | null;
+  lastAddedItemTitle: string | null;
+  lastAddedVariantTitle: string | null;
   initialize: () => Promise<void>;
   refresh: () => Promise<void>;
   addItem: (variantId: string, quantity?: number) => Promise<void>;
@@ -43,6 +46,8 @@ export const useCartStore = create<CartStoreState>()(
       initialized: false,
       loading: false,
       error: null,
+      lastAddedItemTitle: null,
+      lastAddedVariantTitle: null,
 
       initialize: async () => {
         if (get().loading) {
@@ -123,7 +128,33 @@ export const useCartStore = create<CartStoreState>()(
             }),
           );
 
-          set({ cart, loading: false, initialized: true, isOpen: true });
+          const addedItem = cart.items.find((item) => item.variantId === variantId) ?? null;
+
+          set({
+            cart,
+            loading: false,
+            initialized: true,
+            isOpen: true,
+            lastAddedItemTitle: addedItem?.productTitle ?? null,
+            lastAddedVariantTitle: addedItem?.variantTitle ?? null,
+          });
+
+          if (addedItem) {
+            trackAddToCart({
+              value: addedItem.price * quantity,
+              items: [
+                createAnalyticsItem({
+                  itemId: addedItem.variantId,
+                  itemName: addedItem.productTitle,
+                  itemVariant: addedItem.variantTitle,
+                  price: addedItem.price,
+                  quantity,
+                  sku: addedItem.sku,
+                }),
+              ],
+              contentName: addedItem.productTitle,
+            });
+          }
         } catch (error) {
           set({
             loading: false,
